@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feasibility Media - Internal Chat</title>
+    
+    <!-- 
+      This is a single-file, vanilla HTML/CSS/JS application.
+      No external libraries or frameworks are used.
+    -->
+    
+    <style>
+        /* --- 1. Global Setup & CSS Variables --- */
+        :root {
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-family-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            --transition-speed: 0.2s;
+            
+            /* Light Mode (Default) */
+            --bg-app: #ffffff;
+            --bg-sidebar: #f8f8f8;
+            --bg-sidebar-hover: #ebebeb;
+            --bg-sidebar-active: #e1e1e1;
+            --bg-main: #ffffff;
+            --bg-message-input: #ffffff;
+            --bg-message-own: #e1f5fe;
+            --bg-message-other: #f1f1f1;
+            --bg-modal: rgba(255, 255, 255, 0.8);
+            --bg-button: #0d6efd;
+            --bg-button-danger: #dc3545;
+            
+            --text-color: #242424;
+            --text-color-dim: #555;
+            --text-color-sidebar: #1d1c1d;
+            --text-color-sidebar-header: #000;
+            --text-color-button: #ffffff;
+            
+            --border-color: #e0e0e0;
+            --shadow-light: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-heavy: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .dark-mode {
+            /* Dark Mode */
+            --bg-app: #1a1d21;
+            --bg-sidebar: #18191c;
+            --bg-sidebar-hover: #2c2d30;
+            --bg-sidebar-active: #3a3b3e;
+            --bg-main: #222529;
+            --bg-message-input: #3a3b3e;
+            --bg-message-own: #005c9e;
+            --bg-message-other: #3a3b3e;
+            --bg-modal: rgba(25, 27, 29, 0.8);
+            --bg-button: #0d6efd;
+            --bg-button-danger: #dc3545;
+
+            --text-color: #e4e6eb;
+            --text-color-dim: #b0b3b8;
+            --text-color-sidebar: #e4e6eb;
+            --text-color-sidebar-header: #ffffff;
+            --text-color-button: #ffffff;
+
+            --border-color: #3e4042;
+        }
+
+        /* --- 2. Basic Reset & App Layout --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font-family);
+            background-color: var(--bg-app);
+            color: var(--text-color);
+            font-size: 15px;
+        }
+
+        #app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            background-color: var(--bg-app);
+            transition: background-color var(--transition-speed);
+        }
+
+        /* --- 3. Sidebar --- */
+        #sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: background-color var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        #sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        #sidebar-header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-color-sidebar-header);
+            cursor: default; /* Default cursor */
+        }
+        
+        #user-info {
+            display: flex;
+            align-items: center;
+            margin-top: 16px;
+        }
+        
+        #user-info .avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 12px;
+            margin-right: 8px;
+            background-color: #0d6efd;
+            color: #fff;
+        }
+        
+        #user-info .user-details {
+            line-height: 1.3;
+        }
+        
+        #user-info .user-name {
+            font-weight: 600;
+            color: var(--text-color-sidebar-header);
+        }
+        
+        #user-info .user-role {
+            font-size: 12px;
+            color: var(--text-color-dim);
+        }
+
+        #sidebar-nav {
+            flex: 1;
+            padding: 16px 8px;
+            overflow-y: auto;
+        }
+
+        #sidebar-nav h2 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-color-dim);
+            padding: 4px 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        #dm-list {
+            list-style: none;
+            margin-top: 8px;
+        }
+        
+        .dm-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+        
+        .dm-item:hover {
+            background-color: var(--bg-sidebar-hover);
+        }
+        
+        .dm-item.active {
+            background-color: var(--bg-sidebar-active);
+        }
+
+        .dm-item .avatar {
+            width: 24px;
+            height: 24px;
+            font-size: 11px;
+            margin-right: 10px;
+        }
+        
+        .dm-item span {
+            font-weight: 500;
+            color: var(--text-color-sidebar);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        #sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        #theme-toggle {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            background-color: var(--bg-sidebar-hover);
+            color: var(--text-color-dim);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+        
+        #theme-toggle:hover {
+            background-color: var(--bg-sidebar-active);
+            color: var(--text-color);
+        }
+        
+        /* --- 4. Main Chat Area --- */
+        #main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-main);
+            transition: background-color var(--transition-speed);
+        }
+
+        #chat-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-light);
+            z-index: 10;
+        }
+        
+        #chat-header-details {
+            display: flex;
+            align-items: center;
+        }
+        
+        #hamburger-menu {
+            display: none; /* Hidden on desktop */
+            background: none;
+            border: none;
+            color: var(--text-color-dim);
+            cursor: pointer;
+            padding: 4px;
+            margin-right: 12px;
+            border-radius: 6px;
+        }
+        
+        #hamburger-menu:hover {
+            background-color: var(--bg-sidebar-hover);
+        }
+        
+        #hamburger-menu svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        #chat-header-details .avatar {
+            width: 32px;
+            height: 32px;
+            margin-right: 12px;
+        }
+
+        #chat-header-details .user-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-color-sidebar-header);
+        }
+        
+        #chat-header-details .user-role {
+            font-size: 13px;
+            color: var(--text-color-dim);
+        }
+
+        #message-list-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        /* Message Fade-in Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-group {
+            display: flex;
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .message-group .avatar {
+            width: 36px;
+            height: 36px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        /* Shared Avatar Styles */
+        .avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #fff;
+            overflow: hidden; /* For image avatars if added */
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .message-details {
+            max-width: 80%;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            margin-right: 8px;
+            color: var(--text-color-sidebar-header);
+        }
+        
+        .message-timestamp {
+            font-size: 12px;
+            color: var(--text-color-dim);
+        }
+        
+        .message-bubble {
+            padding: 10px 14px;
+            background-color: var(--bg-message-other);
+            border-radius: 12px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            transition: background-color var(--transition-speed);
+        }
+        
+        .message-bubble p {
+            margin-bottom: 8px;
+        }
+        
+        .message-bubble p:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Own Messages */
+        .message-group.is-own {
+            justify-content: flex-end;
+        }
+        
+        .message-group.is-own .message-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .message-group.is-own .message-bubble {
+            background-color: var(--bg-message-own);
+            color: var(--text-color);
+            border-radius: 12px;
+        }
+        
+        .message-group.is-own .avatar {
+            order: 2;
+            margin-right: 0;
+            margin-left: 12px;
+        }
+        
+        /* --- 5. Typing Indicator & Message Input --- */
+        #typing-indicator {
+            height: 24px;
+            padding: 0 20px;
+        }
+        
+        #typing-indicator-text {
+            font-size: 13px;
+            font-style: italic;
+            color: var(--text-color-dim);
+            transition: opacity 0.2s;
+        }
+        
+        /* Typing dots animation */
+        .typing-dots span {
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background-color: var(--text-color-dim);
+            border-radius: 50%;
+            margin-left: 3px;
+            animation: typing 1s infinite;
+        }
+        .typing-dots span:nth-child(1) { animation-delay: 0.1s; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-3px); }
+        }
+        
+        #message-form-wrapper {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-app);
+            transition: background-color var(--transition-speed);
+        }
+        
+        #message-form {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: var(--bg-message-input);
+            padding: 4px;
+            transition: background-color var(--transition-speed), border-color var(--transition-speed);
+        }
+        
+        #message-form:focus-within {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+        }
+
+        #message-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 12px;
+            font-family: var(--font-family);
+            font-size: 15px;
+            resize: none;
+            background-color: transparent;
+            color: var(--text-color);
+            height: 48px; /* Default height */
+            line-height: 1.5;
+        }
+
+        #message-form button {
+            background-color: var(--bg-button);
+            color: var(--text-color-button);
+            border: none;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            margin-right: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        
+        #message-form button:hover {
+            filter: brightness(1.1);
+        }
+        
+        #message-form button svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* --- 6. Admin Panel (Hidden by default) --- */
+        .hidden {
+            display: none !important;
+        }
+        
+        #admin-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-modal);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #admin-modal {
+            background-color: var(--bg-main);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-heavy);
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+        }
+        
+        #admin-modal h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-color-sidebar-header);
+        }
+        
+        .admin-section {
+            margin-bottom: 20px;
+        }
+        
+        .admin-section label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        .admin-input, .admin-select {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-message-input);
+            color: var(--text-color);
+        }
+        
+        .admin-button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .admin-button, .admin-button-danger, .admin-button-secondary {
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+        
+        .admin-button {
+            background-color: var(--bg-button);
+            color: var(--text-color-button);
+        }
+        
+        .admin-button-danger {
+            background-color: var(--bg-button-danger);
+            color: var(--text-color-button);
+        }
+        
+        .admin-button-secondary {
+            background-color: var(--bg-message-other);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .admin-button:hover, .admin-button-danger:hover, .admin-button-secondary:hover {
+            filter: brightness(1.1);
+        }
+        
+        #admin-close {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--text-color-dim);
+            cursor: pointer;
+        }
+        
+        /* --- 7. Responsive Mobile Styles --- */
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                z-index: 1001; /* Above backdrop */
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                box-shadow: var(--shadow-heavy);
+                border-right: 1px solid var(--border-color);
+            }
+            
+            #sidebar.open {
+                transform: translateX(0);
+            }
+            
+            #main-chat {
+                width: 100%;
+            }
+            
+            #hamburger-menu {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #mobile-menu-backdrop {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.4);
+                z-index: 1000;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s ease-in-out;
+            }
+            
+            body.mobile-menu-open #mobile-menu-backdrop {
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            #admin-modal {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body class="light-mode">
+
+    <!-- The main application container -->
+    <div id="app-container">
+
+        <!-- --- Sidebar --- -->
+        <aside id="sidebar">
+            <div id="sidebar-header">
+                <h1 id="app-title">Feasibility Media</h1>
+                <div id="user-info">
+                    <div class="avatar" style="background-color: #0d6efd;">AM</div>
+                    <div class="user-details">
+                        <div class="user-name">Aryaveer Mishra</div>
+                        <div class="user-role">CEO (Admin)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav id="sidebar-nav">
+                <h2>Direct Messages</h2>
+                <ul id="dm-list">
+                    <!-- DM list will be populated by JavaScript -->
+                </ul>
+            </nav>
+            
+            <footer id="sidebar-footer">
+                <button id="theme-toggle">Toggle Light/Dark Mode</button>
+            </footer>
+        </aside>
+
+        <!-- --- Main Chat Area --- -->
+        <main id="main-chat">
+            <header id="chat-header">
+                <!-- Chat header will be populated by JavaScript -->
+                <div id="chat-header-details">
+                    <button id="hamburger-menu" title="Toggle Menu">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <!-- e.g., <div class="avatar">...</div> <div>Name, Role</div> -->
+                </div>
+            </header>
+            
+            <div id="message-list-wrapper">
+                <div id="message-list">
+                    <!-- Messages will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div id="typing-indicator">
+                <span id="typing-indicator-text"></span>
+            </div>
+
+            <div id="message-form-wrapper">
+                <form id="message-form">
+                    <textarea id="message-input" placeholder="Message..." rows="1"></textarea>
+                    <button type="submit" title="Send Message">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                    </button>
+                </form>
+            </div>
+            
+            <div id="mobile-menu-backdrop"></div>
+        </main>
+    </div>
+
+    <!-- --- Admin Panel (Hidden) --- -->
+    <div id="admin-panel" class="hidden">
+        <div id="admin-modal">
+            <button id="admin-close">&times;</button>
+            <h2>Admin Panel</h2>
+            
+            <div class="admin-section">
+                <label for="admin-persona-select">Send Message As:</label>
+                <select id="admin-persona-select" class="admin-select">
+                    <!-- Personas will be populated by JavaScript -->
+                </select>
+                <textarea id="admin-message-input" class="admin-input" rows="2" placeholder="Type a fake message..."></textarea>
+                <button id="admin-send-button" class="admin-button" style="margin-top: 10px;">Send Message</button>
+            </div>
+            
+            <div class="admin-section">
+                <label>Trigger Staff Actions:</label>
+                <div class="admin-button-group">
+                    <button id="admin-trigger-morning" class="admin-button-secondary">Trigger Morning Summary</button>
+                    <button id="admin-trigger-progress" class="admin-button-secondary">Trigger Progress Update</button>
+                </div>
+            </div>
+            
+            <div class="admin-section">
+                <label>Chat Management (Permanent):</label>
+                <div class="admin-button-group">
+                    <button id="admin-clear-chat" class="admin-button-danger">Clear All Chat History</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Sound (Base64 encoded to keep it in one file) -->
+    <audio id="notification-sound" src="data:audio/mpeg;base64,SUQzBAAAAAAAIvarimNADAAAAAAAADYtVGl0bGUAAAAHAAAAQmxpcCBGS0lUczBAAAAAAAAPY0NNRDsAAACmAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATEFNRSAzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRSAzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////AABtAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVLTEFVRSAzLjExMABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////AABtAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDSWa/ADAAAAQ/GENBKpYAgAAGkAAAAAAAAAAAAAABpAAAAAAAAAAAAAABQQBAAABQAAPAAYAAAAIAAAABVVVVVVVVVVVVVVVVVVVVVVDYTExVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDNVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVPRO1Read the following guidelines for writing a good abstract and provide 15 multiple-choice questions with 4 options each, along with the answer key.
+
+**Key Characteristics of a Good Abstract:**
+
+* **Concise and Clear:** An abstract should be a short summary of your paper's main points. It must be brief, clear, and easy to understand.
+* **Accurate:** It must accurately reflect the content and purpose of the paper. Do not include information that is not in the paper.
+* **Self-Contained:** The abstract should be understandable on its own, without the reader needing to refer to the full paper.
+* **Non-Evaluative:** Report the content of the paper; do not evaluate it or give opinions.
+* **Coherent and Readable:** The language should be professional, and the text should flow smoothly.
+
+**What to Include in an Abstract:**
+
+1.  **Purpose/Objective (Why?):** The main reason for the research. What problem are you trying to solve?
+2.  **Methodology (How?):** The methods or approaches used to conduct the research. How did you get your results?
+3.  **Results/Findings (What?):** The main findings or results of your research. What did you learn?
+4.  **Conclusion/Implications (So what?):** The main conclusions and their implications. Why do your findings matter?
+
+**What to Avoid in an Abstract:**
+
+* **Jargon and Unnecessary Acronyms:** Avoid technical terms that are not widely understood. If an acronym is necessary, define it on its first use.
+* **Excessive Detail:** Do not include lengthy background information, detailed descriptions of methods, or extensive data.
+* **References to other works:** Do not cite other papers.
+* **Information not in the paper:** All content in the abstract must also be present in the main body of the paper.
+* **Vague phrases:** Avoid phrases like "This paper will discuss..." or "The results are interesting." Be specific.
+
+---
+
+Here are 15 multiple-choice questions based on the provided guidelines for writing a good abstract, along with the answer key.
+
+### Multiple-Choice Questions
+
+**1. What is the primary purpose of an abstract?**
+    a) To provide a detailed critique of the research method.
+    b) To list all the references used in the paper.
+    c) To present a short, clear summary of the paper's main points.
+    d) To evaluate the opinions of other researchers in the field.
+
+**2. The characteristic "Self-Contained" means that the abstract should:**
+    a) Be the only part of the paper that needs to be read.
+    b) Be understandable on its own without reading the full paper.
+    c) Contain personal opinions and reflections.
+    d) Exclude any mention of the paper's results.
+
+**3. According to the guidelines, which of the following should be included in an abstract?**
+    a) Purpose, Methodology, Results, and Conclusion.
+    b) A detailed literature review and background history.
+    c) Personal opinions and evaluations of the research.
+    d) A list of all acronyms that will be used in the paper.
+
+**4. The "Methodology" section of an abstract answers which question?**
+    a) Why was the research done?
+    b) So what do the findings mean?
+    c) What did you learn?
+    d) How did you get your results?
+
+**5. The "Conclusion/Implications" section of an abstract answers which question?**
+    a) Why was the research done?
+    b) So what do the findings matter?
+    c) What problem are you solving?
+    d) How did you conduct the research?
+
+**6. Which of the following should be *avoided* in an abstract?**
+    a) A clear statement of the research objective.
+    b) A brief summary of the main findings.
+    c) Citing references to other published papers.
+    d) Using professional and readable language.
+
+**7. What does it mean for an abstract to be "Non-Evaluative"?**
+    a) It should not include any data or results.
+    b) It should report the paper's content without giving opinions.
+    c) It should evaluate the success of the research.
+    d) It should invite other researchers to evaluate the paper.
+
+**8. If you must use a technical acronym in your abstract, what is the correct procedure?**
+    a) Do not use it at all; technical terms are banned.
+    b) Define it on its first use within the abstract.
+    c) Assume the reader already knows what it means.
+    d) Provide a separate glossary at the beginning of the abstract.
+
+**9. Which of the following is an example of a "vague phrase" that should be avoided?**
+    a) "The study found a 15% increase in efficiency."
+    b) "This paper will discuss several interesting topics."
+    c) "The methodology involved a double-blind study."
+    d) "The results imply a need for policy changes."
+
+**10. Why should you avoid including excessive detail in an abstract?**
+    a) Because the abstract must be brief and summarize only the main points.
+    b) Because detailed information is always inaccurate.
+    c) Because the abstract is only for experts in the field.
+    d) Because details make the abstract "evaluative."
+
+**11. The "Results/Findings" section of an abstract should focus on:**
+    a) The main problems that motivated the research.
+    b) The specific methods used to collect data.
+    c) The main things the research learned or discovered.
+    d) The implications of the research for the future.
+
+**12. A "Concise and Clear" abstract is one that:**
+    a) Uses complex sentences and extensive jargon.
+    b) Is long and provides extensive background.
+    c) Is brief, easy to understand, and to the point.
+    d) Is written for a general audience with no prior knowledge.
+
+**13. Which statement violates the rule "Accurate"?**
+    a) The abstract mentions the primary research question.
+    b) The abstract includes a key finding from the results section.
+    c) The abstract includes a conclusion not supported by the paper's data.
+    d) The abstract briefly describes the research methodology.
+
+**14. An abstract should *not* include:**
+    a) The purpose of the research.
+    b) The main conclusions.
+    c) Information that is not in the full paper.
+    d) The key results.
+
+**15. What is the main problem with using the phrase "The results are very interesting" in an abstract?**
+    a) It is non-evaluative.
+    b) It is vague and evaluative.
+    c) It is too accurate.
+    d) It is a necessary part of the conclusion.
+
+---
+
+### Answer Key
+
+1.  **c)** To present a short, clear summary of the paper's main points.
+2.  **b)** Be understandable on its own without reading the full paper.
+3.  **a)** Purpose, Methodology, Results, and Conclusion.
+4.  **d)** How did you get your results?
+5.  **b)** So what do the findings matter?
+6.  **c)** Citing references to other published papers.
+7.  **b)** It should report the paper's content without giving opinions.
+8.  **b)** Define it on its first use within the abstract.
+9.  **b)** "This paper will discuss several interesting topics."
+10. **a)** Because the abstract must be brief and summarize only the main points.
+11. **c)** The main things the research learned or discovered.
+12. **c)** Is brief, easy to understand, and to the point.
+13. **c)** The abstract includes a conclusion not supported by the paper's data.
+14. **c)** Information that is not in the full paper.
+15. **b)** It is vague and evaluative.
+</audio>
+
+    <!-- 
+    ================================================================
+    --- 7. JAVASCRIPT APPLICATION ---
+    All logic is contained within this single script block.
+    ================================================================
+    -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 1. STATE & CONSTANTS ---
+            
+            const USER_ID = 'ceo';
+            const USER_NAME = 'Aryaveer Mishra';
+
+            const PERSONAS = {
+                'aston': {
+                    id: 'aston',
+                    name: 'Aston',
+                    role: 'Team Lead',
+                    avatarColor: '#28a745',
+                    avatarInitials: 'A'
+                },
+                'maya': {
+                    id: 'maya',
+                    name: 'Maya',
+                    role: 'Designer',
+                    avatarColor: '#fd7e14',
+                    avatarInitials: 'M'
+                },
+                'ravi': {
+                    id: 'ravi',
+                    name: 'Ravi',
+                    role: 'Sales Head',
+                    avatarColor: '#dc3545',
+                    avatarInitials: 'R'
+                },
+                'neha': {
+                    id: 'neha',
+                    name: 'Neha',
+                    role: 'Marketing',
+                    avatarColor: '#6f42c1',
+                    avatarInitials: 'N'
+                },
+                'kabir': {
+                    id: 'kabir',
+                    name: 'Kabir',
+                    role: 'Freelancer (Video)',
+                    avatarColor: '#6c757d',
+                    avatarInitials: 'K'
+                }
+            };
+            
+            // This is the "brain" for replies - NEW PRIORITIZED STRUCTURE
+            const REPLY_LOGIC = {
+                'aston': {
+                    rules: [
+                        { keywords: ['project alpha', 'alpha'], replies: ["'Project Alpha' is on track. The dev team is pushing the final build to staging tonight.", "Alpha is 90% complete. We're just running final QA checks now.", "All modules for Alpha are code-complete. Moving to integration testing."] },
+                        { keywords: ['project zeta', 'zeta'], replies: ["Client feedback on 'Zeta' was positive. Starting the requested revisions now.", "Running a day behind on 'Zeta' integration, but we should be able to make up the time by EOD tomorrow.", "Zeta is deployed and awaiting client review."] },
+                        { keywords: ['scope creep', 'delta client'], replies: ["That 'Delta' client is definitely pushing the scope. We need to schedule a meeting to discuss a change order.", "Yes, I'm seeing the scope creep too. I've asked the team to log all out-of-scope requests for our next call."] },
+                        { keywords: ['blocker', 'stuck', 'problem', 'issue'], replies: ["We've hit a small blocker on the payment integration for 'Alpha'. The API docs are unclear. I'm reaching out to their support.", "No major blockers right now, just the usual small bugs we're squashing.", "The team is a bit stretched with the 'Zeta' revisions, but we're managing. No critical issues."] },
+                        { keywords: ['timeline', 'deadline', 'schedule'], replies: ["We're on schedule for all major deliverables this week.", "Alpha is on track for its deadline. No issues there.", "Zeta might be a day late, but I've already cleared it with the client. They're fine with it."] },
+                        { keywords: ['update', 'progress', 'status'], replies: ["Progress is steady. We're 80% done with the current sprint.", "On it. The dev team is focusing on 'Project Alpha' sprint 3.", "Things are moving smoothly. I'll send out the full weekly summary this afternoon."] },
+                        { keywords: ['deploy', 'release', 'push', 'live'], replies: ["We're scheduling the 'Alpha' release for Thursday at 8 PM, pending final client approval.", "The latest build is live on staging for you to review."] }
+                    ],
+                    generic: ["Got it.", "Understood.", "Will do.", "On it.", "Okay, I'll follow up.", "Acknowledged."]
+                },
+                'maya': {
+                    rules: [
+                        { keywords: ['omega', 'landing page'], replies: ["Working on the new mockups for 'Omega'! They're looking 🔥", "Just sent you the v2 designs for the 'Omega' homepage. Let me know what you think! 😊"] },
+                        { keywords: ['logo', 'brand', 'guidelines'], replies: ["The client loved the new logo! 🥳", "The brand guidelines for 'Sigma' are ready for review. I've put the PDF in the shared drive.", "Finalizing the color palette for the 'Apex' branding. It's coming together nicely."] },
+                        { keywords: ['design', 'mockup', 'wireframe', 'creative'], replies: ["Yep, I have the wireframes for the user dashboard done. Will send them over after lunch.", "I have a few new creative ideas for the social media graphics. Sending them over soon.", "Feeling super inspired today! 🎨"] },
+                        { keywords: ['feedback', 'revisions', 'changes', 'tweaks'], replies: ["No problem, I can make those tweaks. Easy fix.", "Hmm, I see what they mean. I'll work on a revision for that screen.", "Awesome! Glad you liked it. ✨"] }
+                    ],
+                    generic: ["Okay!", "Sounds good!", "On it! 👍", "Perfect, thanks!", "Gotcha! 😉"]
+                },
+                'ravi': {
+                    rules: [
+                        { keywords: ['closed', 'signed', 'won', 'new client'], replies: ["Just closed the 'Apex' deal! Contract signed. It's a 12-month retainer.", "Good news! 'Stellar Solutions' just signed. Onboarding starts Monday.", "We officially won the 'Quantum' pitch. Huge win for us! 🚀"] },
+                        { keywords: ['sales target', 'quota', 'revenue target'], replies: ["We're on track to hit the quarterly target.", "We're 90% to our monthly target. Pushing hard for the last 10% today and tomorrow.", "We're projecting to beat the quarterly quota by at least 15% at this rate."] },
+                        { keywords: ['pipeline', 'leads', 'prospects', 'funnel'], replies: ["The pipeline is full. We have 5 new qualified leads from Neha's campaign.", "I'm nurturing 3 enterprise-level prospects. Things are looking promising.", "Our lead velocity is solid. The funnel is healthier than last quarter."] },
+                        { keywords: ['sales', 'numbers', 'revenue'], replies: ["Morning! Sales are looking strong. We're up 14% this week.", "The numbers for last month are finalized. We hit 110% of our goal.", "Revenue is steady. 'Apex' and 'Quantum' will be big boosts starting next month."] },
+                        { keywords: ['client', 'customer', 'deck', 'proposal'], replies: ["'Quantum' is very happy. They're already looking to upgrade their package.", "'Stellar' is dragging their feet on the proposal. I'm following up today.", "Just had a great call with a new prospect. Sending them the deck now."] }
+                    ],
+                    generic: ["Great.", "Will do.", "Understood.", "Sounds like a plan.", "Copied."]
+                },
+                'neha': {
+                    rules: [
+                        { keywords: ['ctr', 'cpl', 'cpa', 'performance'], replies: ["The new ad campaign is live. CTR is 2.3% so far, which is above average.", "Cost per lead (CPL) is down to $45, which is great.", "The Google Ads performance is solid. CPA is stable at $120."] },
+                        { keywords: ['campaign', 'ads', 'ppc'], replies: ["The 'Zeta' campaign is performing well. We've generated 50 MQLs from it this week.", "I'm pausing the Facebook ad set for 'Omega'. The creative seems to be fatigued. Maya and I are brainstorming new angles."] },
+                        { keywords: ['seo', 'content', 'blog', 'keyword'], replies: ["Our latest blog post is getting great engagement. Over 1k shares.", "SEO report for last month is ready. We're up in 15 key search terms.", "The new content strategy is working. Organic traffic is up 12%."]},
+                        { keywords: ['social', 'facebook', 'instagram', 'tiktok', 'linkedin'], replies: ["The LinkedIn post about our 'Apex' case study is performing really well.", "I'm scheduling out the social content for next week. Kabir is getting me the video clips tomorrow."] },
+                        { keywords: ['stats', 'data', 'report'], replies: ["Leads are up 22% month-over-month.", "Here's the performance data you asked for: [Link to Report]. Overall, positive trend.", "I'll have the full monthly marketing report in your inbox by 3 PM."] },
+                        { keywords: ['budget', 'ad spend'], replies: ["Need your go-ahead on the influencer budget for next quarter. The brief is in your inbox.", "We're reallocating some of the ad spend from Facebook to Google. Seeing better ROI there.", "Budget is on track. 60% spent for the month."] }
+                    ],
+                    generic: ["Got it.", "Will send that over.", "Okay, makes sense.", "Data looks good.", "Copied."]
+                },
+                'kabir': {
+                    rules: [
+                        { keywords: ['alpha promo', 'promo video'], replies: ["Sent the first cut for the 'Alpha' promo video. Check your email for the review link.", "Client approved the 'Alpha' promo rough cut. Moving to color grading and final audio mix."] },
+                        { keywords: ['video', 'editing', 'cut'], replies: ["Editing video 2 (client testimonial) now. Should be live by tonight.", "The render is taking forever, but it'll be done soon.", "All edits for the social clips are complete. Uploading to the drive now."] },
+                        { keywords: ['feedback', 'revisions', 'changes', 'edit'], replies: ["Yep, I can make that change. Will send a new export in an hour or so.", "Got the feedback. Working on those revisions now."] },
+                        { keywords: ['timeline', 'deadline'], replies: ["On track to deliver by Friday EOD.", "Running a bit behind, the source footage was corrupted. Re-downloading now, so might be tomorrow morning.", "Should be done by tomorrow morning."] }
+                    ],
+                    generic: ["k.", "sure.", "got it.", "no problem.", "sounds good.", "yep."]
+                }
+            };
+            
+            // App state
+            let allMessages = {}; // { 'personaId': [messageObj, messageObj], ... }
+            let currentChatId = 'aston';
+            let typingTimers = {};
+            let adminTapCount = 0;
+            let adminTapTimer = null;
+
+            // DOM Elements
+            const sidebarEl = document.getElementById('sidebar');
+            const dmListEl = document.getElementById('dm-list');
+            const chatHeaderDetailsEl = document.getElementById('chat-header-details');
+            const messageListEl = document.getElementById('message-list');
+            const messageListWrapperEl = document.getElementById('message-list-wrapper');
+            const messageFormEl = document.getElementById('message-form');
+            const messageInputEl = document.getElementById('message-input');
+            const typingIndicatorEl = document.getElementById('typing-indicator-text');
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const notificationSoundEl = document.getElementById('notification-sound');
+            const hamburgerMenuBtn = document.getElementById('hamburger-menu');
+            const mobileBackdropEl = document.getElementById('mobile-menu-backdrop');
+            const appTitleEl = document.getElementById('app-title');
+            
+            // Admin Panel DOM Elements
+            const adminPanelEl = document.getElementById('admin-panel');
+            const adminCloseBtn = document.getElementById('admin-close');
+            const adminPersonaSelectEl = document.getElementById('admin-persona-select');
+            const adminMessageInputEl = document.getElementById('admin-message-input');
+            const adminSendBtn = document.getElementById('admin-send-button');
+            const adminTriggerMorningBtn = document.getElementById('admin-trigger-morning');
+            const adminTriggerProgressBtn = document.getElementById('admin-trigger-progress');
+            const adminClearChatBtn = document.getElementById('admin-clear-chat');
+
+
+            // --- 2. CORE FUNCTIONS ---
+
+            /**
+             * Initializes the application
+             */
+            function init() {
+                loadMessages();
+                seedInitialHistory();
+                renderSidebar();
+                renderAdminPanelPersonas();
+                selectChat(currentChatId);
+                attachEventListeners();
+            }
+            
+            /**
+             * Attaches all event listeners
+             */
+            function attachEventListeners() {
+                messageFormEl.addEventListener('submit', handleSendMessage);
+                themeToggleBtn.addEventListener('click', toggleTheme);
+                
+                // Mobile Menu Listeners
+                hamburgerMenuBtn.addEventListener('click', openMobileMenu);
+                mobileBackdropEl.addEventListener('click', closeMobileMenu);
+
+                // Auto-resize textarea
+                messageInputEl.addEventListener('input', () => {
+                    messageInputEl.style.height = 'auto';
+                    messageInputEl.style.height = (messageInputEl.scrollHeight) + 'px';
+                });
+                
+                // Send on Enter (but not Shift+Enter)
+                messageInputEl.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        messageFormEl.dispatchEvent(new Event('submit'));
+                    }
+                });
+                
+                // Admin Panel Listeners
+                document.addEventListener('keydown', handleAdminKeydown);
+                appTitleEl.addEventListener('click', handleAdminTap); // Mobile admin trigger
+                adminCloseBtn.addEventListener('click', closeAdminPanel);
+                adminSendBtn.addEventListener('click', handleAdminSend);
+                adminTriggerMorningBtn.addEventListener('click', triggerMorningSummary);
+                adminTriggerProgressBtn.addEventListener('click', triggerProgressUpdate);
+                adminClearChatBtn.addEventListener('click', clearAllChatHistory);
+            }
+            
+            /**
+             * Loads messages from localStorage
+             */
+            function loadMessages() {
+                const storedMessages = localStorage.getItem('fmChatMessages');
+                if (storedMessages) {
+                    allMessages = JSON.parse(storedMessages);
+                } else {
+                    // Initialize empty message arrays for each persona
+                    Object.keys(PERSONAS).forEach(id => {
+                        allMessages[id] = [];
+                    });
+                }
+            }
+            
+            /**
+             * Saves all messages to localStorage
+             */
+            function saveMessages() {
+                localStorage.setItem('fmChatMessages', JSON.stringify(allMessages));
+            }
+            
+            /**
+             * Adds realistic initial messages if the chat is new
+             */
+            function seedInitialHistory() {
+                if (localStorage.getItem('fmChatSeeded')) return;
+                
+                const now = new Date();
+                const yesterday = new Date(now.getTime() - (24 * 60 * 60 * 1000));
+                const twoDaysAgo = new Date(now.getTime() - (2 * 24 * 60 * 60 * 1000));
+                
+                const seedData = [
+                    { 
+                        id: 'ravi', 
+                        timestamp: twoDaysAgo.setHours(10, 15), 
+                        messages: ["Morning Aryaveer. Just letting you know the 'Apex' deal is looking very positive. They should sign this week."]
+                    },
+                    { 
+                        id: USER_ID, 
+                        timestamp: twoDaysAgo.setHours(10, 17), 
+                        messages: ["Great news, Ravi. Keep me posted."] 
+                    },
+                    { 
+                        id: 'maya', 
+                        timestamp: yesterday.setHours(14, 30), 
+                        messages: ["Hey! Sent over the v1 designs for the new 'Omega' landing page. Really excited about this one! ✨"] 
+                    },
+                    { 
+                        id: 'neha', 
+                        timestamp: yesterday.setHours(16, 05), 
+                        messages: ["Quick update: The 'Zeta' campaign performance is solid. We're seeing a 15% increase in qualified leads since we adjusted the ad copy."]
+                    },
+                    {
+                        id: 'aston',
+                        timestamp: (new Date()).setHours(9, 2),
+                        messages: ["Morning. Just a heads-up, the dev team is deploying the 'Alpha' update this morning. Should be no downtime."]
+                    }
+                ];
+                
+                seedData.forEach(data => {
+                    const author = data.id === USER_ID ? { id: USER_ID, name: USER_NAME } : PERSONAS[data.id];
+                    addMessage(author.id, author.name, data.timestamp, data.messages, data.id !== USER_ID);
+                });
+                
+                localStorage.setItem('fmChatSeeded', 'true');
+                saveMessages();
+            }
+
+            // --- 3. RENDER FUNCTIONS ---
+            
+            /**
+             * Renders the Direct Messages list in the sidebar
+             */
+            function renderSidebar() {
+                dmListEl.innerHTML = '';
+                Object.values(PERSONAS).forEach(persona => {
+                    const li = document.createElement('li');
+                    li.className = 'dm-item';
+                    li.dataset.id = persona.id;
+                    li.setAttribute('role', 'button');
+                    li.innerHTML = `
+                        <div class="avatar" style="background-color: ${persona.avatarColor};">${persona.avatarInitials}</div>
+                        <span>${persona.name}</span>
+                    `;
+                    li.addEventListener('click', () => selectChat(persona.id));
+                    dmListEl.appendChild(li);
+                });
+            }
+            
+            /**
+             * Sets the active chat and renders its content
+             * @param {string} personaId
+             */
+            function selectChat(personaId) {
+                currentChatId = personaId;
+                const persona = PERSONAS[personaId];
+                
+                // Update active state in sidebar
+                document.querySelectorAll('.dm-item').forEach(item => {
+                    item.classList.toggle('active', item.dataset.id === personaId);
+                });
+                
+                // Render chat header
+                chatHeaderDetailsEl.innerHTML = `
+                    <div class="avatar" style="background-color: ${persona.avatarColor};">${persona.avatarInitials}</div>
+                    <div>
+                        <div class="user-name">${persona.name}</div>
+                        <div class="user-role">${persona.role}</div>
+                    </div>
+                `;
+                
+                renderMessages();
+                messageInputEl.focus();
+                
+                // Close mobile menu on chat selection
+                closeMobileMenu();
+            }
+            
+            /**
+             * Renders all messages for the currently active chat
+             */
+            function renderMessages() {
+                messageListEl.innerHTML = '';
+                const messages = allMessages[currentChatId] || [];
+                
+                messages.forEach(msg => {
+                    const el = createMessageGroupElement(msg);
+                    messageListEl.appendChild(el);
+                });
+                
+                scrollToBottom();
+            }
+            
+            /**
+             * Creates the HTML element for a message group
+             * @param {object} msg - The message object
+             */
+            function createMessageGroupElement(msg) {
+                const persona = msg.authorId === USER_ID ? { name: USER_NAME, role: 'CEO (Admin)', avatarColor: '#0d6efd', avatarInitials: 'AM' } : PERSONAS[msg.authorId];
+                const isOwn = msg.authorId === USER_ID;
+                
+                const groupEl = document.createElement('div');
+                groupEl.className = `message-group ${isOwn ? 'is-own' : ''}`;
+                groupEl.dataset.messageId = msg.timestamp; // Use timestamp as a unique ID
+                
+                const messageContent = msg.messages.map(p => `<p>${p}</p>`).join('');
+                
+                groupEl.innerHTML = `
+                    <div class="avatar" style="background-color: ${persona.avatarColor};">${persona.avatarInitials}</div>
+                    <div class="message-details">
+                        <div class="message-header">
+                            <span class="message-sender">${persona.name}</span>
+                            <span class="message-timestamp">${formatTimestamp(msg.timestamp)}</span>
+                        </div>
+                        <div class="message-bubble">
+                            ${messageContent}
+                        </div>
+                    </div>
+                `;
+                return groupEl;
+            }
+
+            /**
+             * Scrolls the message list to the bottom
+             */
+            function scrollToBottom() {
+                messageListWrapperEl.scrollTop = messageListWrapperEl.scrollHeight;
+            }
+            
+            /**
+             * Formats a timestamp into a readable string (e.g., "10:30 AM")
+             * @param {number} timestamp - The timestamp (Date.now())
+             */
+            function formatTimestamp(timestamp) {
+                const date = new Date(timestamp);
+                const today = new Date();
+                const yesterday = new Date(today.getTime() - (24 * 60 * 60 * 1000));
+
+                const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                
+                if (date.toLocaleDateString() === today.toLocaleDateString()) {
+                    return `Today at ${time}`;
+                }
+                if (date.toLocaleDateString() === yesterday.toLocaleDateString()) {
+                    return `Yesterday at ${time}`;
+                }
+                return `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at ${time}`;
+            }
+
+            // --- 4. MESSAGE LOGIC ---
+            
+            /**
+             * Handles the user sending a message
+             * @param {Event} e - The form submit event
+             */
+            function handleSendMessage(e) {
+                e.preventDefault();
+                const text = messageInputEl.value.trim();
+                
+                if (text === '') return;
+                
+                // Add the user's message
+                addMessage(USER_ID, USER_NAME, Date.now(), [text], true);
+                
+                // Clear input and reset height
+                messageInputEl.value = '';
+                messageInputEl.style.height = '48px';
+                
+                // Generate a reply
+                generateReply(currentChatId, text);
+            }
+            
+            /**
+             * Adds a new message to the state and UI
+             * @param {string} authorId
+             * @param {string} authorName
+             * @param {number} timestamp
+             * @param {Array<string>} messages - Array of message paragraphs
+             * @param {boolean} isNew - Should this message trigger notifications/saving
+             */
+            function addMessage(authorId, authorName, timestamp, messages, isNew = false) {
+                const messageData = {
+                    authorId,
+                    authorName,
+                    timestamp,
+                    messages
+                };
+                
+                // Find the correct message list (e.g., 'aston')
+                let conversationId = (authorId === USER_ID) ? currentChatId : authorId;
+                
+                if (!allMessages[conversationId]) {
+                    allMessages[conversationId] = [];
+                }
+                
+                allMessages[conversationId].push(messageData);
+                
+                // Only render if it belongs to the current chat
+                if (conversationId === currentChatId) {
+                    const el = createMessageGroupElement(messageData);
+                    messageListEl.appendChild(el);
+                    scrollToBottom();
+                }
+                
+                if (isNew) {
+                    saveMessages();
+                    if (authorId !== USER_ID) {
+                        playNotificationSound();
+                    }
+                }
+            }
+            
+            /**
+             * Simulates a staff member replying
+             * @param {string} personaId
+             * @param {string} userMessage - The message the user sent
+             */
+            function generateReply(personaId, userMessage) {
+                const persona = PERSONAS[personaId];
+                const logic = REPLY_LOGIC[personaId];
+                const lowerMessage = userMessage.toLowerCase().replace(/[^\w\s]/g, ''); //- remove punctuation
+                
+                let reply = logic.generic[Math.floor(Math.random() * logic.generic.length)];
+                
+                // --- NEW LOGIC ---
+                // Loop through the prioritized rules and find the FIRST match
+                let foundMatch = false;
+                for (const rule of logic.rules) {
+                    // Check if any keyword in this rule's list is in the user's message
+                    if (rule.keywords.some(k => lowerMessage.includes(k))) {
+                        const options = rule.replies;
+                        reply = options[Math.floor(Math.random() * options.length)];
+                        foundMatch = true;
+                        break; // Stop at the first match (most specific)
+                    }
+                }
+                // --- END NEW LOGIC ---
+                
+                const typingDelay = 1000 + Math.random() * 2000; // 1-3 seconds typing
+                const replyDelay = typingDelay + (2000 + Math.random() * 3000); // 3-8 seconds total
+                
+                showTypingIndicator(persona.name, typingDelay);
+                
+                // Set a timer to send the actual reply
+                typingTimers[personaId] = setTimeout(() => {
+                    addMessage(persona.id, persona.name, Date.now(), [reply], true);
+                }, replyDelay);
+            }
+            
+            /**
+             * Shows the "... is typing" indicator
+             * @param {string} name - The name of the person typing
+             * @param {number} duration - How long to show it
+             */
+            function showTypingIndicator(name, duration) {
+                if (typingTimers[currentChatId]) {
+                    clearTimeout(typingTimers[currentChatId]);
+                }
+                
+                typingIndicatorEl.innerHTML = `${name} is typing<span class="typing-dots"><span></span><span></span><span></span></span>`;
+                typingIndicatorEl.style.opacity = 1;
+                
+                // Clear the typing indicator after the duration
+                typingTimers[currentChatId] = setTimeout(() => {
+                    typingIndicatorEl.style.opacity = 0;
+                    typingIndicatorEl.innerHTML = '';
+                }, duration);
+            }
+
+            /**
+             * Plays the notification sound
+             */
+            function playNotificationSound() {
+                notificationSoundEl.currentTime = 0;
+                notificationSoundEl.play().catch(e => console.log("Audio play failed. User interaction needed."));
+            }
+
+            // --- 5. THEME, MOBILE & ADMIN LOGIC ---
+            
+            /**
+             * Toggles between light and dark mode
+             */
+            function toggleTheme() {
+                document.body.classList.toggle('dark-mode');
+                
+                // Save preference
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                localStorage.setItem('fmChatTheme', isDarkMode ? 'dark' : 'light');
+                themeToggleBtn.textContent = isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+            }
+            
+            /**
+             * Loads saved theme preference
+             */
+            function loadTheme() {
+                const savedTheme = localStorage.getItem('fmChatTheme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    themeToggleBtn.textContent = 'Switch to Light Mode';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    themeToggleBtn.textContent = 'Switch to Dark Mode';
+                }
+            }
+            
+            /**
+             * Toggles the admin panel on Shift + A
+             * @param {Event} e - The keydown event
+             */
+            function handleAdminKeydown(e) {
+                if (e.key === 'A' && e.shiftKey) {
+                    e.preventDefault();
+                    openAdminPanel();
+                }
+            }
+            
+            /**
+             * Handles the mobile 5-tap trigger for admin panel
+             */
+            function handleAdminTap() {
+                adminTapCount++;
+                if (adminTapTimer) {
+                    clearTimeout(adminTapTimer);
+                }
+                adminTapTimer = setTimeout(() => {
+                    adminTapCount = 0; // Reset after 1.5 seconds
+                }, 1500);
+
+                if (adminTapCount >= 5) {
+                    adminTapCount = 0;
+                    clearTimeout(adminTapTimer);
+                    openAdminPanel();
+                }
+            }
+
+            /**
+             * Opens the mobile sidebar menu
+             */
+            function openMobileMenu() {
+                sidebarEl.classList.add('open');
+                document.body.classList.add('mobile-menu-open');
+            }
+
+            /**
+             * Closes the mobile sidebar menu
+             */
+            function closeMobileMenu() {
+                sidebarEl.classList.remove('open');
+                document.body.classList.remove('mobile-menu-open');
+            }
+
+            /**
+             * Opens the admin panel
+             */
+            function openAdminPanel() {
+                adminPanelEl.classList.remove('hidden');
+            }
+
+            /**
+             * Closes the admin panel
+             */
+            function closeAdminPanel() {
+                adminPanelEl.classList.add('hidden');
+            }
+
+            /**
+             * Populates the admin panel's persona dropdown
+             */
+            function renderAdminPanelPersonas() {
+                adminPersonaSelectEl.innerHTML = '';
+                Object.values(PERSONAS).forEach(persona => {
+                    const option = document.createElement('option');
+                    option.value = persona.id;
+                    option.textContent = `${persona.name} (${persona.role})`;
+                    adminPersonaSelectEl.appendChild(option);
+                });
+            }
+            
+            /**
+             * Handles sending a "fake" message from the admin panel
+             */
+            function handleAdminSend() {
+                const personaId = adminPersonaSelectEl.value;
+                const message = adminMessageInputEl.value.trim();
+                
+                if (!personaId || !message) return;
+                
+                const persona = PERSONAS[personaId];
+                
+                // Add the fake message
+                addMessage(persona.id, persona.name, Date.now(), [message], true);
+                
+                adminMessageInputEl.value = '';
+                closeAdminPanel();
+            }
+            
+            /**
+             * Triggers a morning summary from all staff
+             */
+            function triggerMorningSummary() {
+                const messages = [
+                    { id: 'aston', text: "Morning. Dev team is focusing on 'Project Alpha' sprint 3. No blockers." },
+                    { id: 'ravi', text: "Morning boss! Sales are up 14% this week 🚀 Following up on 3 hot leads today." },
+                    { id: 'neha', text: "Morning! The new ad campaign for 'Zeta' is live. Monitoring CTR now." },
+                    { id: 'maya', text: "Morning! ☀️ Working on the 'Omega' mockups, should have v1 by EOD." },
+                    { id: 'kabir', text: "mornin. editing the client testimonial video. will send link today." }
+                ];
+                
+                messages.forEach((msg, index) => {
+                    const persona = PERSONAS[msg.id];
+                    setTimeout(() => {
+                        addMessage(persona.id, persona.name, Date.now(), [msg.text], true);
+                    }, index * 1500); // Stagger the messages
+                });
+                
+                closeAdminPanel();
+            }
+
+            /**
+             * Triggers a progress update from all staff
+             */
+            function triggerProgressUpdate() {
+                const messages = [
+                    { id: 'aston', text: "Progress update: 'Alpha' build is stable. Moving to QA." },
+                    { id: 'ravi', text: "Just got a verbal 'yes' from 'Stellar Solutions'! Sending the contract now." },
+                    { id: 'neha', text: "The influencer campaign is locked in. Total reach estimated at 2M." },
+                    { id: 'maya', text: "Revisions for the 'Sigma' brand guide are done. Sending to Aston for review." }
+                ];
+
+                messages.forEach((msg, index) => {
+                    const persona = PERSONAS[msg.id];
+                    setTimeout(() => {
+                        addMessage(persona.id, persona.name, Date.now(), [msg.text], true);
+                    }, index * 1500); // Stagger the messages
+                });
+
+                closeAdminPanel();
+            }
+
+            /**
+             * Clears all messages from state and localStorage
+             */
+            function clearAllChatHistory() {
+                if (confirm('Are you sure you want to permanently delete ALL chat history?')) {
+                    allMessages = {};
+                    Object.keys(PERSONAS).forEach(id => {
+                        allMessages[id] = [];
+                    });
+                    
+                    localStorage.removeItem('fmChatMessages');
+                    localStorage.removeItem('fmChatSeeded');
+                    
+                    renderMessages(); // Clear the current view
+                    closeAdminPanel();
+                    
+                    // Re-seed the chat to make it look alive again
+                    seedInitialHistory();
+                    renderMessages();
+                }
+            }
+
+            // --- 6. START THE APP ---
+            loadTheme();
+            init();
+
+        });
+    </script>
+
+</body>
+</html>
+
+
+
+
