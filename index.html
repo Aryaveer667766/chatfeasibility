@@ -1,505 +1,127 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmos Group Holdings | Institutional Excellence</title>
+    <title>Official Invitation: IDS 2026 | Chairman Aryaveer Mishra</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         body {
+            background-color: #0f172a;
             font-family: 'Inter', sans-serif;
-            background-color: #020617;
-            color: #e2e8f0;
         }
-
-        @keyframes fade-in {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .serif {
+            font-family: 'Playfair Display', serif;
         }
-        .animate-fade-in { animation: fade-in 1s ease-out forwards; }
-        
-        @keyframes spin-slow {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .gold-text {
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .animate-spin-slow { animation: spin-slow 25s linear infinite; }
-
-        .cosmic-bg {
-            position: fixed;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 0;
+        .gold-border {
+            border-image: linear-gradient(to right, #bf953f, #fcf6ba, #aa771c) 1;
         }
-
-        .noise-overlay {
-            position: absolute;
-            inset: 0;
-            opacity: 0.03;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        .invitation-card {
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5), inset 0 0 100px rgba(191, 149, 63, 0.05);
         }
-
-        .nav-scrolled {
-            background-color: rgba(2, 6, 23, 0.95);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(30, 41, 59, 0.5);
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
-        }
-
-        .strategy-tab.active {
-            background-color: #2563eb;
-            border-color: #3b82f6;
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
-        }
-
-        .strategy-tab.active .icon-container {
-            color: white;
+        @media print {
+            .no-print { display: none; }
+            body { background-color: white; }
+            .invitation-card { border: 2px solid #bf953f; color: black; background: white; shadow: none; }
+            .invitation-card p, .invitation-card h2 { color: black !important; }
         }
     </style>
 </head>
-<body class="selection:bg-blue-500/30 overflow-x-hidden">
+<body class="flex items-center justify-center min-h-screen p-4 md:p-12">
 
-    <!-- Immersive Cosmic Background -->
-    <div class="cosmic-bg">
-        <div class="absolute top-[-10%] left-[-5%] w-[70%] h-[70%] bg-blue-600/10 blur-[180px] rounded-full animate-pulse"></div>
-        <div class="absolute bottom-[-5%] right-[-5%] w-[60%] h-[60%] bg-indigo-600/10 blur-[180px] rounded-full"></div>
-        <div class="noise-overlay"></div>
-    </div>
+    <div class="max-w-4xl w-full invitation-card border-[12px] gold-border p-8 md:p-20 relative overflow-hidden text-center">
+        
+        <!-- Decorative Corners -->
+        <div class="absolute top-4 left-4 w-20 h-20 border-t-2 border-l-2 border-[#bf953f]/30"></div>
+        <div class="absolute top-4 right-4 w-20 h-20 border-t-2 border-r-2 border-[#bf953f]/30"></div>
+        <div class="absolute bottom-4 left-4 w-20 h-20 border-b-2 border-l-2 border-[#bf953f]/30"></div>
+        <div class="absolute bottom-4 right-4 w-20 h-20 border-b-2 border-r-2 border-[#bf953f]/30"></div>
 
-    <!-- Navigation -->
-    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 py-8">
-        <div class="container mx-auto px-6 flex justify-between items-center">
-            <!-- Redesigned Logo Section -->
-            <div class="flex items-center gap-5 group cursor-pointer">
-                <div class="relative w-14 h-14 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                    <!-- Outer Orbital Rings -->
-                    <div class="absolute inset-0 border-2 border-blue-500/20 rounded-full animate-[spin_12s_linear_infinite]"></div>
-                    <div class="absolute inset-1 border border-indigo-400/10 rounded-full animate-[spin_8s_linear_infinite_reverse]"></div>
-                    
-                    <!-- Core Mark -->
-                    <div class="relative w-10 h-10 bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-950 rounded-xl flex items-center justify-center shadow-[0_0_30px_rgba(37,99,235,0.4)] ring-1 ring-white/20 overflow-hidden">
-                        <!-- Glassmorphism shine -->
-                        <div class="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-gradient-to-br from-white/20 via-transparent to-transparent rotate-45"></div>
-                        <span class="text-white font-black text-2xl italic tracking-tighter relative z-10">C</span>
-                    </div>
-                </div>
-                <div class="flex flex-col">
-                    <span class="text-2xl font-black tracking-[0.1em] text-white uppercase leading-tight italic">Cosmos</span>
-                    <span class="text-[9px] font-bold tracking-[0.5em] text-blue-400 uppercase opacity-80">Group Holdings</span>
-                </div>
+        <!-- IAMAI Logo Concept -->
+        <div class="mb-12 flex justify-center flex-col items-center">
+            <div class="text-[#bf953f] font-black tracking-[0.4em] text-[10px] uppercase mb-4">Presented By</div>
+            <div class="relative w-24 h-12 flex items-center justify-center border border-[#bf953f]/40 px-4">
+                <span class="text-white font-black text-xl tracking-tighter italic">IAMAI</span>
             </div>
-
-            <div class="hidden lg:flex items-center gap-10 text-[11px] font-black uppercase tracking-[0.25em]">
-                <a href="#about" class="hover:text-blue-400 transition-colors">Our Ethos</a>
-                <a href="#strategy" class="hover:text-blue-400 transition-colors">Infrastructure</a>
-                <a href="#flagship" class="hover:text-blue-400 transition-colors">Flagship</a>
-                <a href="#leadership" class="hover:text-blue-400 transition-colors">Leadership</a>
-                <button class="bg-white text-slate-900 px-8 py-3 rounded-full hover:bg-blue-600 hover:text-white transition-all shadow-xl font-bold uppercase tracking-widest text-[10px]">
-                    Investor Relations
-                </button>
-            </div>
-
-            <button class="lg:hidden text-white" id="menu-btn">
-                <i data-lucide="menu" size="32"></i>
-            </button>
         </div>
-    </nav>
 
-    <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu" class="fixed inset-0 z-40 bg-[#020617] transition-all duration-700 translate-x-full lg:hidden">
-        <div class="flex flex-col items-start justify-center h-full gap-8 px-12 text-4xl font-black uppercase italic tracking-tighter">
-            <button class="absolute top-8 right-8 text-white" id="close-btn">
-                <i data-lucide="x" size="32"></i>
-            </button>
-            <a href="#about" class="mobile-link">Ethos</a>
-            <a href="#strategy" class="mobile-link">Infrastructure</a>
-            <a href="#flagship" class="mobile-link">Flagship</a>
-            <a href="#leadership" class="mobile-link">Leadership</a>
-            <div class="h-px w-full bg-slate-800 my-4"></div>
-            <button class="text-blue-500 text-xl font-bold uppercase tracking-widest">Connect with HQ</button>
-        </div>
-    </div>
+        <!-- Header -->
+        <h4 class="text-[#bf953f] font-bold uppercase tracking-[0.5em] text-xs mb-8">Internet and Mobile Association of India</h4>
+        
+        <p class="serif text-white text-xl md:text-2xl italic mb-10 opacity-90">Requests the distinguished presence of</p>
+        
+        <h1 class="gold-text serif text-4xl md:text-7xl font-bold mb-6 tracking-tight italic">Aryaveer Mishra</h1>
+        
+        <p class="text-blue-400 font-bold uppercase tracking-[0.3em] text-xs mb-12">Chairman, Cosmos Group Holdings</p>
 
-    <!-- Hero Section -->
-    <section class="relative pt-48 pb-32 md:pt-64 md:pb-48 px-6 overflow-hidden text-left md:text-center">
-        <div class="container mx-auto relative z-10">
-            <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-blue-500/5 border border-blue-500/20 text-blue-400 text-[11px] font-black uppercase tracking-[0.4em] mb-12 animate-fade-in shadow-xl">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                </span>
-                Universal Media Governance
-            </div>
-            <h1 class="text-7xl md:text-[10rem] font-black text-white mb-12 leading-[0.8] tracking-tighter uppercase italic drop-shadow-2xl">
-                Powering <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-white to-cyan-400">
-                    The Horizon.
-                </span>
-            </h1>
-            <p class="max-w-3xl mx-auto text-slate-400 text-lg md:text-2xl mb-16 leading-relaxed font-light">
-                Cosmos Group Holdings is a multi-national conglomerate orchestrating the world's most sophisticated digital ecosystems. We build the architecture of universal influence.
+        <!-- Body -->
+        <div class="max-w-2xl mx-auto space-y-6 text-slate-300 leading-relaxed mb-16">
+            <p class="text-lg">
+                To join the elite panel of <span class="text-white font-bold">Keynote Visionaries</span> at the
             </p>
-            <div class="flex flex-col sm:flex-row gap-6 justify-center">
-                <a href="#flagship" class="group px-12 py-6 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-500 transition-all shadow-2xl shadow-blue-600/30 flex items-center justify-center gap-4">
-                    Explore Portfolio <i data-lucide="arrow-up-right" class="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
-                </a>
-                <button class="px-12 py-6 bg-slate-900/40 backdrop-blur-md text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all border border-slate-700/50 hover:bg-slate-800 shadow-xl">
-                    Corporate Overview
-                </button>
+            <h2 class="serif text-4xl md:text-6xl text-white italic">"20th India Digital Summit 2026"</h2>
+            <p class="text-sm tracking-widest uppercase font-bold text-blue-500/80">Theme: The Era of Adaptive Intelligence</p>
+            <p>
+                In recognition of your groundbreaking work with <span class="italic font-bold text-white">Feasibility Media</span>, we invite you to lead the discourse on "Strategic Viability in the Age of Generative Influence."
+            </p>
+        </div>
+
+        <!-- Event Details -->
+        <div class="grid md:grid-cols-3 gap-8 border-y border-[#bf953f]/20 py-10 mb-16">
+            <div class="space-y-2">
+                <div class="flex justify-center text-[#bf953f] mb-2"><i data-lucide="calendar"></i></div>
+                <p class="text-white font-bold uppercase tracking-widest text-xs">Dates</p>
+                <p class="text-slate-400 font-medium">January 28 - 29, 2026</p>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-center text-[#bf953f] mb-2"><i data-lucide="map-pin"></i></div>
+                <p class="text-white font-bold uppercase tracking-widest text-xs">Venue</p>
+                <p class="text-slate-400 font-medium italic">Bharat Mandapam,<br>Pragati Maidan, New Delhi</p>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-center text-[#bf953f] mb-2"><i data-lucide="clock"></i></div>
+                <p class="text-white font-bold uppercase tracking-widest text-xs">Special Session</p>
+                <p class="text-slate-400 font-medium">14:30 Hours | Hall 5</p>
             </div>
         </div>
-    </section>
 
-    <!-- Strategy Section -->
-    <section id="strategy" class="py-32 border-y border-slate-900 bg-slate-900/10">
-        <div class="container mx-auto px-6">
-            <div class="grid lg:grid-cols-12 gap-16">
-                <div class="lg:col-span-5">
-                    <h3 class="text-blue-500 font-bold uppercase tracking-[0.5em] text-[10px] mb-6">Group Infrastructure</h3>
-                    <h2 class="text-4xl md:text-6xl font-black text-white mb-10 tracking-tighter uppercase italic">Institutional <br> Excellence.</h2>
-                    <div class="space-y-4" id="strategy-tabs">
-                        <!-- Strategy Tabs will be injected here -->
-                    </div>
+        <!-- RSVP -->
+        <div class="space-y-4">
+            <p class="text-[#bf953f] font-bold uppercase tracking-[0.2em] text-[10px]">Security Clearance: VIP - VVIP Tier 1</p>
+            <p class="text-slate-500 text-xs italic">Kindly confirm your session attendance to the IAMAI Protocol Liaison by Jan 20th</p>
+            <div class="pt-8">
+                <div class="inline-block p-4 border border-[#bf953f]/30 rounded-xl bg-white/5">
+                    <!-- Dynamic QR representing official IAMAI portal -->
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.indiadigitalsummit.in/RSVP/ARYAVEER_MISHRA_IDS2026" alt="RSVP QR" class="opacity-80 grayscale invert">
                 </div>
-                <div class="lg:col-span-7 flex flex-col justify-center">
-                    <div id="strategy-display" class="p-10 md:p-16 bg-slate-900/40 rounded-[40px] border border-slate-800 relative overflow-hidden group min-h-[400px]">
-                        <!-- Strategy Content will be injected here -->
-                    </div>
-                </div>
+                <p class="mt-2 text-[10px] text-slate-600 font-bold tracking-widest uppercase">E-Pass ID: IAMAI-IDS-2026-0042</p>
             </div>
         </div>
-    </section>
 
-    <!-- Flagship Section -->
-    <section id="flagship" class="py-40 relative">
-        <div class="container mx-auto px-6 text-center">
-            <div class="w-px h-24 bg-gradient-to-b from-blue-600 to-transparent mx-auto mb-12"></div>
-            <h2 class="text-4xl md:text-8xl font-black text-white tracking-tighter uppercase italic leading-none mb-4">
-                FEASIBILITY <br> MEDIA
-            </h2>
-            <p class="text-blue-400 font-bold tracking-[0.6em] text-xs uppercase mb-24">The Flagship Subsidiary</p>
+    </div>
 
-            <div class="grid lg:grid-cols-2 gap-8 items-stretch text-left">
-                <div class="p-12 bg-gradient-to-br from-blue-600 to-indigo-800 rounded-[40px] text-white flex flex-col justify-between shadow-3xl shadow-blue-600/20">
-                    <div>
-                        <i data-lucide="award" class="w-12 h-12 mb-10 text-white/80"></i>
-                        <h3 class="text-3xl font-black mb-6 uppercase tracking-tighter italic">Tactical Execution Hub</h3>
-                        <p class="text-blue-100 text-lg leading-relaxed mb-12 opacity-90">
-                            As the primary operational arm of Cosmos, Feasibility Media translates high-level corporate vision into market-dominant media campaigns. It is the engine that drives our universal footprint.
-                        </p>
-                    </div>
-                    <div class="space-y-6">
-                        <div class="flex justify-between items-end border-b border-white/20 pb-4">
-                            <span class="font-bold uppercase tracking-widest text-xs">Market Reach</span>
-                            <span class="text-4xl font-black tracking-tighter italic">GLOBAL</span>
-                        </div>
-                        <div class="flex justify-between items-end border-b border-white/20 pb-4">
-                            <span class="font-bold uppercase tracking-widest text-xs">Campaign Velocity</span>
-                            <span class="text-4xl font-black tracking-tighter italic">ACCELERATED</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid gap-8">
-                    <div class="p-10 bg-slate-900 border border-slate-800 rounded-[40px] hover:border-blue-500/50 transition-all">
-                        <div class="flex justify-between items-start mb-10">
-                            <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-blue-400">
-                                <i data-lucide="zap" size="24"></i>
-                            </div>
-                            <a href="https://feasibilitymedia.in" target="_blank" class="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 text-slate-500 hover:text-white transition-colors">
-                                Access Portal <i data-lucide="external-link" size="14"></i>
-                            </a>
-                        </div>
-                        <h4 class="text-xl font-bold text-white mb-4 uppercase tracking-widest">Media Architecture</h4>
-                        <p class="text-slate-500 text-sm leading-relaxed mb-6">Propelling brands through the digital noise with surgical precision and creative disruption.</p>
-                        <div class="flex flex-wrap gap-3">
-                            <span class="px-4 py-1.5 rounded-full bg-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Performance</span>
-                            <span class="px-4 py-1.5 rounded-full bg-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Social</span>
-                            <span class="px-4 py-1.5 rounded-full bg-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Creative</span>
-                        </div>
-                    </div>
-                    <div class="p-10 bg-slate-900 border border-slate-800 rounded-[40px] hover:border-blue-500/50 transition-all flex items-center justify-between">
-                        <div>
-                            <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-widest italic">Performance Metrics</h4>
-                            <p class="text-slate-500 text-sm">Real-time engagement tracking across 14 markets.</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-4xl font-black text-blue-500 tracking-tighter italic">3.5x</span>
-                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Avg Growth</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Leadership Section -->
-    <section id="leadership" class="py-32 bg-slate-900/30">
-        <div class="container mx-auto px-6">
-            <div class="max-w-6xl mx-auto text-left">
-                <div class="grid md:grid-cols-2 gap-20 items-center">
-                    <div class="relative">
-                        <div class="absolute inset-0 bg-blue-600/30 blur-[120px] rounded-full"></div>
-                        <div class="relative aspect-[3/4] rounded-[50px] overflow-hidden border border-slate-700 bg-slate-800 shadow-3xl">
-                            <div class="absolute inset-0 flex items-center justify-center opacity-10">
-                                <i data-lucide="users" style="width: 300px; height: 300px;"></i>
-                            </div>
-                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-                            <div class="absolute inset-0 p-12 flex flex-col justify-end">
-                                <h3 class="text-4xl font-black text-white uppercase italic tracking-tighter">Aryaveer Mishra</h3>
-                                <p class="text-blue-500 font-bold tracking-[0.4em] text-xs uppercase mb-6">Founder & Chairman</p>
-                                <div class="flex gap-4">
-                                    <a href="https://www.linkedin.com/in/aryaveer-mishra" target="_blank" class="w-12 h-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all">
-                                        <i data-lucide="linkedin" size="20"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="text-blue-500 font-bold uppercase tracking-[0.5em] text-[10px] mb-6 text-left">The Office of the Chairman</h3>
-                        <h2 class="text-4xl md:text-6xl font-black text-white mb-10 tracking-tighter uppercase italic leading-tight text-left">Leading the <br> New Standard.</h2>
-                        <div class="relative mb-12">
-                            <i data-lucide="quote" class="absolute -top-8 -left-8 text-blue-500/10 w-20 h-20"></i>
-                            <p class="text-2xl font-light text-slate-300 leading-relaxed italic relative z-10">
-                                "Cosmos was not built to follow markets—it was built to define them. We hold the tools of the future, and we apply them with the discipline of the past."
-                            </p>
-                        </div>
-                        <div class="space-y-8 text-slate-400 text-lg leading-relaxed">
-                            <p>Aryaveer Mishra’s leadership is defined by a relentless focus on "Feasibility"—the logical vetting of every ambitious vision. Under his guidance, the group has evolved from a media boutique into a globally recognized holding powerhouse.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- News Hub -->
-    <section class="py-24 border-t border-slate-900">
-        <div class="container mx-auto px-6">
-            <div class="flex justify-between items-end mb-16 text-left">
-                <div>
-                    <h3 class="text-blue-500 font-bold uppercase tracking-[0.5em] text-[10px] mb-4">Insights hub</h3>
-                    <h2 class="text-3xl font-black text-white uppercase italic tracking-tighter">Press & Global Reports</h2>
-                </div>
-                <button class="hidden md:flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors">
-                    View Newsroom <i data-lucide="chevron-right" size="14"></i>
-                </button>
-            </div>
-            <div class="grid md:grid-cols-3 gap-8 text-left" id="news-grid">
-                <!-- News items will be injected here -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="py-40 relative overflow-hidden bg-blue-700">
-        <div class="absolute inset-0 bg-black/10 backdrop-blur-[2px]"></div>
-        <div class="container mx-auto px-6 relative z-10 text-left">
-            <div class="max-w-5xl mx-auto bg-white rounded-[50px] p-12 md:p-24 shadow-4xl grid md:grid-cols-2 gap-20 items-center">
-                <div>
-                    <h2 class="text-slate-900 text-5xl font-black uppercase tracking-tighter italic mb-8">Initiate <br> Contact.</h2>
-                    <p class="text-slate-600 text-lg mb-12">For strategic partnerships, institutional inquiries, or corporate governance matters, connect with the Chairman's Office.</p>
-                    <div class="space-y-6">
-                        <div class="flex items-center gap-6 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                            <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600">
-                                <i data-lucide="mail" size="20"></i>
-                            </div>
-                            <div>
-                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">General HQ</div>
-                                <div class="text-slate-900 font-bold">info@cosmosholdings.global</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="space-y-6">
-                    <input type="text" placeholder="Full Name / Entity" class="w-full px-8 py-5 bg-slate-100 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all font-bold placeholder:text-slate-400 text-slate-900">
-                    <textarea placeholder="Nature of Inquiry" rows="4" class="w-full px-8 py-5 bg-slate-100 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all font-bold placeholder:text-slate-400 text-slate-900"></textarea>
-                    <button class="w-full py-6 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-blue-600 transition-all shadow-xl">Submit to Governance</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="pt-32 pb-12 bg-black border-t border-slate-900 text-left">
-        <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-16 mb-24">
-                <div class="col-span-1 lg:col-span-2">
-                    <!-- Redesigned Footer Logo -->
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="relative w-12 h-12 flex items-center justify-center">
-                            <div class="absolute inset-0 border border-blue-500/30 rounded-full animate-spin-slow"></div>
-                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg">
-                                <span class="text-white font-black text-lg italic">C</span>
-                            </div>
-                        </div>
-                        <span class="text-2xl font-black tracking-tighter text-white uppercase italic">Cosmos <span class="text-blue-500 italic">Holdings</span></span>
-                    </div>
-                    <p class="text-slate-500 max-w-sm text-lg font-medium leading-relaxed mb-8">The global governing entity for market-disrupting digital assets. Strategically led by Aryaveer Mishra.</p>
-                </div>
-                <div>
-                    <h4 class="text-white font-black mb-10 text-xs uppercase tracking-[0.2em]">Institutional</h4>
-                    <ul class="space-y-4 text-slate-600 text-[11px] font-bold uppercase tracking-widest">
-                        <li><a href="#strategy" class="hover:text-blue-500 transition-colors">Group Strategy</a></li>
-                        <li><a href="#flagship" class="hover:text-blue-500 transition-colors">Feasibility Media</a></li>
-                        <li><a href="#" class="hover:text-blue-500 transition-colors">Investor Relations</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-white font-black mb-10 text-xs uppercase tracking-[0.2em]">Compliance</h4>
-                    <ul class="space-y-4 text-slate-600 text-[11px] font-bold uppercase tracking-widest">
-                        <li><a href="#" class="hover:text-blue-500 transition-colors">Privacy Protocol</a></li>
-                        <li><a href="#" class="hover:text-blue-500 transition-colors">Terms of Governance</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="pt-12 border-t border-slate-900 text-[9px] font-black uppercase tracking-[0.4em] text-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p>© 2024 Cosmos Group Holdings. All rights reserved.</p>
-                <p>System Status: Active</p>
-            </div>
-        </div>
-    </footer>
+    <!-- Controls -->
+    <div class="fixed bottom-8 right-8 no-print flex gap-4">
+        <button onclick="window.print()" class="p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white hover:bg-white hover:text-black transition-all shadow-2xl" title="Print Invitation">
+            <i data-lucide="printer"></i>
+        </button>
+        <button class="p-4 bg-blue-600 border border-blue-500 rounded-full text-white hover:bg-blue-500 transition-all shadow-2xl" title="Share Invitation">
+            <i data-lucide="share-2"></i>
+        </button>
+    </div>
 
     <script>
-        // Data
-        const strategies = [
-            {
-                title: "Strategic Intelligence",
-                icon: "cpu",
-                content: "At the core of Cosmos lies our Strategic Intelligence Unit (SIU). We leverage advanced predictive analytics to identify market shifts before they occur, ensuring Feasibility Media stays ahead of global trends.",
-                features: ["Market Arbitrage Analysis", "Sentiment Mapping", "Predictive Trend Modeling"]
-            },
-            {
-                title: "Capital & Growth",
-                icon: "trending-up",
-                content: "Cosmos provides the financial bedrock for aggressive expansion. We manage the capital flows that allow our flagship subsidiary to acquire top-tier talent and cutting-edge technology infrastructure.",
-                features: ["Global Resource Allocation", "M&A Advisory", "Scalability Engineering"]
-            },
-            {
-                title: "Governance & Ethics",
-                icon: "shield-check",
-                content: "We maintain rigorous standards of corporate governance. Every project executed by Feasibility Media is audited for ethical compliance and long-term brand safety.",
-                features: ["Brand Safety Protocols", "Ethical AI Usage", "Regulatory Compliance"]
-            }
-        ];
-
-        const newsItems = [
-            { date: "Oct 2024", tag: "Expansion", title: "Cosmos Holdings Announces New Strategic Corridor for Media Growth." },
-            { date: "Sept 2024", tag: "Innovation", title: "Feasibility Media Integrates Proprietary AI Research from Cosmos Labs." },
-            { date: "Aug 2024", tag: "Leadership", title: "Chairman Aryaveer Mishra Outlines 2025 Vision for Universal Digital Access." }
-        ];
-
-        // Initialization
         window.onload = function() {
             lucide.createIcons();
-            renderStrategies();
-            renderNews();
-            setupNavigation();
-            setupMenu();
         };
-
-        function setupNavigation() {
-            const navbar = document.getElementById('navbar');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    navbar.classList.add('nav-scrolled');
-                } else {
-                    navbar.classList.remove('nav-scrolled');
-                }
-            });
-        }
-
-        function setupMenu() {
-            const menuBtn = document.getElementById('menu-btn');
-            const closeBtn = document.getElementById('close-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const mobileLinks = document.querySelectorAll('.mobile-link');
-
-            const toggle = () => mobileMenu.classList.toggle('translate-x-full');
-            
-            menuBtn.addEventListener('click', toggle);
-            closeBtn.addEventListener('click', toggle);
-            mobileLinks.forEach(link => link.addEventListener('click', toggle));
-        }
-
-        function renderStrategies() {
-            const tabsContainer = document.getElementById('strategy-tabs');
-            const displayContainer = document.getElementById('strategy-display');
-
-            strategies.forEach((strat, index) => {
-                const btn = document.createElement('button');
-                btn.className = `strategy-tab w-full text-left p-6 rounded-2xl transition-all duration-500 border border-slate-800 bg-slate-900/50 ${index === 0 ? 'active' : ''}`;
-                btn.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <div class="icon-container ${index === 0 ? 'text-white' : 'text-blue-400'}">
-                            <i data-lucide="${strat.icon}" class="w-6 h-6"></i>
-                        </div>
-                        <span class="font-black uppercase tracking-widest text-sm">${strat.title}</span>
-                    </div>
-                `;
-                btn.onclick = () => switchStrategy(index);
-                tabsContainer.appendChild(btn);
-            });
-
-            switchStrategy(0); // Initial render
-            lucide.createIcons();
-        }
-
-        function switchStrategy(index) {
-            const tabs = document.querySelectorAll('.strategy-tab');
-            const displayContainer = document.getElementById('strategy-display');
-            const strat = strategies[index];
-
-            tabs.forEach((tab, i) => {
-                if (i === index) tab.classList.add('active');
-                else tab.classList.remove('active');
-            });
-
-            displayContainer.innerHTML = `
-                <div class="absolute top-0 right-0 p-12 opacity-5 scale-150 group-hover:rotate-12 transition-transform duration-1000">
-                    <i data-lucide="${strat.icon}" style="width: 100px; height: 100px;"></i>
-                </div>
-                <h3 class="text-2xl font-black text-white mb-8 uppercase italic tracking-tighter underline underline-offset-8 decoration-blue-600">
-                    ${strat.title}
-                </h3>
-                <p class="text-xl text-slate-300 leading-relaxed mb-10">
-                    ${strat.content}
-                </p>
-                <div class="grid sm:grid-cols-2 gap-4 text-left">
-                    ${strat.features.map(feat => `
-                        <div class="flex items-center gap-3 text-sm font-bold text-blue-400 uppercase tracking-widest">
-                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                            ${feat}
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            lucide.createIcons();
-        }
-
-        function renderNews() {
-            const grid = document.getElementById('news-grid');
-            newsItems.forEach(news => {
-                const card = document.createElement('div');
-                card.className = "p-8 rounded-3xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all group cursor-pointer text-left";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-6">
-                        <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest px-3 py-1 bg-blue-500/5 rounded-full border border-blue-500/20">${news.tag}</span>
-                        <span class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">${news.date}</span>
-                    </div>
-                    <h4 class="text-lg font-bold text-white mb-6 group-hover:text-blue-400 transition-colors">${news.title}</h4>
-                    <button class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                        Read Release <i data-lucide="arrow-up-right" size="14"></i>
-                    </button>
-                `;
-                grid.appendChild(card);
-            });
-            lucide.createIcons();
-        }
     </script>
 </body>
 </html>
