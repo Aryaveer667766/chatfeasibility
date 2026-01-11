@@ -1,1687 +1,505 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feasibility Media - Internal Chat</title>
-    
-    <!-- 
-      This is a single-file, vanilla HTML/CSS/JS application.
-      No external libraries or frameworks are used.
-    -->
-    
+    <title>Cosmos Group Holdings | Institutional Excellence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- 1. Global Setup & CSS Variables --- */
-        :root {
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --font-family-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-            --transition-speed: 0.2s;
-            
-            /* Light Mode (Default) */
-            --bg-app: #ffffff;
-            --bg-sidebar: #f8f8f8;
-            --bg-sidebar-hover: #ebebeb;
-            --bg-sidebar-active: #e1e1e1;
-            --bg-main: #ffffff;
-            --bg-message-input: #ffffff;
-            --bg-message-own: #e1f5fe;
-            --bg-message-other: #f1f1f1;
-            --bg-modal: rgba(255, 255, 255, 0.8);
-            --bg-button: #0d6efd;
-            --bg-button-danger: #dc3545;
-            
-            --text-color: #242424;
-            --text-color-dim: #555;
-            --text-color-sidebar: #1d1c1d;
-            --text-color-sidebar-header: #000;
-            --text-color-button: #ffffff;
-            
-            --border-color: #e0e0e0;
-            --shadow-light: 0 1px 3px rgba(0,0,0,0.05);
-            --shadow-heavy: 0 4px 12px rgba(0,0,0,0.1);
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617;
+            color: #e2e8f0;
         }
 
-        .dark-mode {
-            /* Dark Mode */
-            --bg-app: #1a1d21;
-            --bg-sidebar: #18191c;
-            --bg-sidebar-hover: #2c2d30;
-            --bg-sidebar-active: #3a3b3e;
-            --bg-main: #222529;
-            --bg-message-input: #3a3b3e;
-            --bg-message-own: #005c9e;
-            --bg-message-other: #3a3b3e;
-            --bg-modal: rgba(25, 27, 29, 0.8);
-            --bg-button: #0d6efd;
-            --bg-button-danger: #dc3545;
-
-            --text-color: #e4e6eb;
-            --text-color-dim: #b0b3b8;
-            --text-color-sidebar: #e4e6eb;
-            --text-color-sidebar-header: #ffffff;
-            --text-color-button: #ffffff;
-
-            --border-color: #3e4042;
-        }
-
-        /* --- 2. Basic Reset & App Layout --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        html, body {
-            height: 100%;
-            overflow: hidden;
-            font-family: var(--font-family);
-            background-color: var(--bg-app);
-            color: var(--text-color);
-            font-size: 15px;
-        }
-
-        #app-container {
-            display: flex;
-            height: 100vh;
-            width: 100vw;
-            background-color: var(--bg-app);
-            transition: background-color var(--transition-speed);
-        }
-
-        /* --- 3. Sidebar --- */
-        #sidebar {
-            width: 260px;
-            flex-shrink: 0;
-            background-color: var(--bg-sidebar);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            transition: background-color var(--transition-speed), border-color var(--transition-speed);
-        }
-
-        #sidebar-header {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        #sidebar-header h1 {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-color-sidebar-header);
-            cursor: default; /* Default cursor */
-        }
-        
-        #user-info {
-            display: flex;
-            align-items: center;
-            margin-top: 16px;
-        }
-        
-        #user-info .avatar {
-            width: 28px;
-            height: 28px;
-            font-size: 12px;
-            margin-right: 8px;
-            background-color: #0d6efd;
-            color: #fff;
-        }
-        
-        #user-info .user-details {
-            line-height: 1.3;
-        }
-        
-        #user-info .user-name {
-            font-weight: 600;
-            color: var(--text-color-sidebar-header);
-        }
-        
-        #user-info .user-role {
-            font-size: 12px;
-            color: var(--text-color-dim);
-        }
-
-        #sidebar-nav {
-            flex: 1;
-            padding: 16px 8px;
-            overflow-y: auto;
-        }
-
-        #sidebar-nav h2 {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-color-dim);
-            padding: 4px 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        #dm-list {
-            list-style: none;
-            margin-top: 8px;
-        }
-        
-        .dm-item {
-            display: flex;
-            align-items: center;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color var(--transition-speed);
-            position: relative;
-        }
-        
-        .dm-item:hover {
-            background-color: var(--bg-sidebar-hover);
-        }
-        
-        .dm-item.active {
-            background-color: var(--bg-sidebar-active);
-        }
-
-        .dm-item .avatar {
-            width: 24px;
-            height: 24px;
-            font-size: 11px;
-            margin-right: 10px;
-        }
-        
-        .dm-item span {
-            font-weight: 500;
-            color: var(--text-color-sidebar);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .unread-dot {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 8px;
-            height: 8px;
-            background-color: var(--bg-button);
-            border-radius: 50%;
-            display: none; /* Hidden by default */
-        }
-
-        .dm-item.unread .unread-dot {
-            display: block;
-        }
-        
-        #sidebar-footer {
-            padding: 16px;
-            border-top: 1px solid var(--border-color);
-        }
-        
-        #theme-toggle {
-            width: 100%;
-            padding: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            background-color: var(--bg-sidebar-hover);
-            color: var(--text-color-dim);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color var(--transition-speed), color var(--transition-speed);
-        }
-        
-        #theme-toggle:hover {
-            background-color: var(--bg-sidebar-active);
-            color: var(--text-color);
-        }
-        
-        /* --- 4. Main Chat Area --- */
-        #main-chat {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background-color: var(--bg-main);
-            transition: background-color var(--transition-speed);
-        }
-
-        #chat-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: var(--shadow-light);
-            z-index: 10;
-        }
-        
-        #chat-header-details {
-            display: flex;
-            align-items: center;
-        }
-        
-        #hamburger-menu {
-            display: none; /* Hidden on desktop */
-            background: none;
-            border: none;
-            color: var(--text-color-dim);
-            cursor: pointer;
-            padding: 4px;
-            margin-right: 12px;
-            border-radius: 6px;
-        }
-        
-        #hamburger-menu:hover {
-            background-color: var(--bg-sidebar-hover);
-        }
-        
-        #hamburger-menu svg {
-            width: 24px;
-            height: 24px;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-        }
-
-        #chat-header-details .avatar {
-            width: 32px;
-            height: 32px;
-            margin-right: 12px;
-        }
-
-        #chat-header-details .user-name {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-color-sidebar-header);
-        }
-        
-        #chat-header-details .user-role {
-            font-size: 13px;
-            color: var(--text-color-dim);
-        }
-
-        #message-list-wrapper {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
-        
-        /* Message Fade-in Animation */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        .animate-fade-in { animation: fade-in 1s ease-out forwards; }
+        
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow { animation: spin-slow 25s linear infinite; }
 
-        .message-group {
-            display: flex;
-            margin-bottom: 4px; /* Reduced margin for multi-bubble */
-        }
-        
-        .message-group.is-own {
-            justify-content: flex-end;
-        }
-
-        /* Group consecutive messages from the same sender */
-        .message-group:not(.is-own) + .message-group:not(.is-own),
-        .message-group.is-own + .message-group.is-own {
-            margin-top: -12px; /* Pull bubbles closer */
-        }
-        
-        .message-group:not(.is-own) + .message-group:not(.is-own) .message-header,
-        .message-group:not(.is-own) + .message-group:not(.is-own) .avatar,
-        .message-group.is-own + .message-group.is-own .message-header,
-        .message-group.is-own + .message-group.is-own .avatar {
-            visibility: hidden; /* Hide avatar and header for subsequent messages */
-            height: 0;
-            margin: 0;
-        }
-        
-        .message-group:not(.is-own) + .message-group:not(.is-own) .message-details {
-            padding-left: 48px; /* Align with first bubble */
-        }
-        
-        .message-group.is-own + .message-group.is-own .message-details {
-            padding-right: 48px; /* Align with first bubble */
-        }
-
-
-        .message-group .avatar {
-            width: 36px;
-            height: 36px;
-            margin-right: 12px;
-            flex-shrink: 0;
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        /* Shared Avatar Styles */
-        .avatar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-weight: 600;
-            color: #fff;
-            overflow: hidden; /* For image avatars if added */
-        }
-        
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .message-details {
-            max-width: 80%;
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        .message-header {
-            display: flex;
-            align-items: baseline;
-            margin-bottom: 4px;
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        .message-sender {
-            font-weight: 600;
-            margin-right: 8px;
-            color: var(--text-color-sidebar-header);
-        }
-        
-        .message-timestamp {
-            font-size: 12px;
-            color: var(--text-color-dim);
-        }
-        
-        .message-bubble {
-            padding: 10px 14px;
-            background-color: var(--bg-message-other);
-            border-radius: 12px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            transition: background-color var(--transition-speed);
-        }
-        
-        .message-bubble p {
-            margin-bottom: 8px;
-        }
-        
-        .message-bubble p:last-child {
-            margin-bottom: 0;
-        }
-        
-        /* Own Messages */
-        .message-group.is-own .message-details {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .message-group.is-own .message-bubble {
-            background-color: var(--bg-message-own);
-            color: var(--text-color);
-            border-radius: 12px;
-        }
-        
-        .message-group.is-own .avatar {
-            order: 2;
-            margin-right: 0;
-            margin-left: 12px;
-        }
-        
-        /* --- 5. Typing Indicator & Message Input --- */
-        #typing-indicator {
-            height: 24px;
-            padding: 0 20px;
-        }
-        
-        #typing-indicator-text {
-            font-size: 13px;
-            font-style: italic;
-            color: var(--text-color-dim);
-            transition: opacity 0.2s;
-            display: flex;
-            align-items: center;
-        }
-        
-        /* Typing dots animation */
-        .typing-dots {
-            display: inline-block;
-            margin-left: 4px;
-        }
-        .typing-dots span {
-            display: inline-block;
-            width: 4px;
-            height: 4px;
-            background-color: var(--text-color-dim);
-            border-radius: 50%;
-            margin-left: 3px;
-            animation: typing 1s infinite;
-        }
-        .typing-dots span:nth-child(1) { animation-delay: 0.1s; }
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-3px); }
-        }
-        
-        #message-form-wrapper {
-            padding: 20px;
-            border-top: 1px solid var(--border-color);
-            background-color: var(--bg-app);
-            transition: background-color var(--transition-speed);
-        }
-        
-        #message-form {
-            display: flex;
-            align-items: center;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background-color: var(--bg-message-input);
-            padding: 4px;
-            transition: background-color var(--transition-speed), border-color var(--transition-speed);
-        }
-        
-        #message-form:focus-within {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
-        }
-
-        #message-input {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 12px;
-            font-family: var(--font-family);
-            font-size: 15px;
-            resize: none;
-            background-color: transparent;
-            color: var(--text-color);
-            height: 48px; /* Default height */
-            line-height: 1.5;
-        }
-
-        #message-form button {
-            background-color: var(--bg-button);
-            color: var(--text-color-button);
-            border: none;
-            border-radius: 8px;
-            width: 36px;
-            height: 36px;
-            margin-right: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s;
-        }
-        
-        #message-form button:hover {
-            filter: brightness(1.1);
-        }
-        
-        #message-form button svg {
-            width: 20px;
-            height: 20px;
-        }
-        
-        /* --- 6. Admin Panel (Hidden by default) --- */
-        .hidden {
-            display: none !important;
-        }
-        
-        #admin-panel {
+        .cosmic-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-modal);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
         }
-        
-        #admin-modal {
-            background-color: var(--bg-main);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-heavy);
-            width: 90%;
-            max-width: 500px;
-            border: 1px solid var(--border-color);
-        }
-        
-        #admin-modal h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--text-color-sidebar-header);
-        }
-        
-        .admin-section {
-            margin-bottom: 20px;
-        }
-        
-        .admin-section label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-color);
-        }
-        
-        .admin-input, .admin-select {
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-message-input);
-            color: var(--text-color);
-        }
-        
-        .admin-button-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .admin-button, .admin-button-danger, .admin-button-secondary {
-            padding: 10px 14px;
-            font-size: 14px;
-            font-weight: 500;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: filter 0.2s;
-        }
-        
-        .admin-button {
-            background-color: var(--bg-button);
-            color: var(--text-color-button);
-        }
-        
-        .admin-button-danger {
-            background-color: var(--bg-button-danger);
-            color: var(--text-color-button);
-        }
-        
-        .admin-button-secondary {
-            background-color: var(--bg-message-other);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-        }
-        
-        .admin-button:hover, .admin-button-danger:hover, .admin-button-secondary:hover {
-            filter: brightness(1.1);
-        }
-        
-        #admin-close {
-            float: right;
-            background: none;
-            border: none;
-            font-size: 24px;
-            font-weight: 300;
-            color: var(--text-color-dim);
-            cursor: pointer;
-        }
-        
-        /* --- 7. Responsive Mobile Styles --- */
-        @media (max-width: 768px) {
-            #sidebar {
-                position: fixed;
-                left: 0;
-                top: 0;
-                height: 100vh;
-                z-index: 1001; /* Above backdrop */
-                transform: translateX(-100%);
-                transition: transform 0.3s ease-in-out;
-                box-shadow: var(--shadow-heavy);
-                border-right: 1px solid var(--border-color);
-            }
-            
-            #sidebar.open {
-                transform: translateX(0);
-            }
-            
-            #main-chat {
-                width: 100%;
-            }
-            
-            #hamburger-menu {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
 
-            #mobile-menu-backdrop {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.4);
-                z-index: 1000;
-                opacity: 0;
-                visibility: hidden;
-                transition: opacity 0.3s ease-in-out;
-            }
-            
-            body.mobile-menu-open #mobile-menu-backdrop {
-                opacity: 1;
-                visibility: visible;
-            }
-            
-            #admin-modal {
-                width: 95%;
-            }
-            
-            .message-group:not(.is-own) + .message-group:not(.is-own) .message-details {
-                padding-left: 0; /* No extra padding on mobile */
-            }
-            
-            .message-group.is-own + .message-group.is-own .message-details {
-                padding-right: 0; /* No extra padding on mobile */
-            }
-            
-            .message-group:not(.is-own) .avatar {
-                margin-right: 8px;
-            }
-            
-            .message-group.is-own .avatar {
-                margin-left: 8px;
-            }
-            
-            .message-details {
-                max-width: 90%;
-            }
+        .noise-overlay {
+            position: absolute;
+            inset: 0;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .nav-scrolled {
+            background-color: rgba(2, 6, 23, 0.95);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .strategy-tab.active {
+            background-color: #2563eb;
+            border-color: #3b82f6;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        }
+
+        .strategy-tab.active .icon-container {
+            color: white;
         }
     </style>
 </head>
-<body class="light-mode">
+<body class="selection:bg-blue-500/30 overflow-x-hidden">
 
-    <!-- The main application container -->
-    <div id="app-container">
-
-        <!-- --- Sidebar --- -->
-        <aside id="sidebar">
-            <div id="sidebar-header">
-                <h1 id="app-title">Feasibility Media</h1>
-                <div id="user-info">
-                    <div class="avatar" style="background-color: #0d6efd;">AM</div>
-                    <div class="user-details">
-                        <div class="user-name">Aryaveer Mishra</div>
-                        <div class="user-role">CEO (Admin)</div>
-                    </div>
-                </div>
-            </div>
-            
-            <nav id="sidebar-nav">
-                <h2>Direct Messages</h2>
-                <ul id="dm-list">
-                    <!-- DM list will be populated by JavaScript -->
-                </ul>
-            </nav>
-            
-            <footer id="sidebar-footer">
-                <button id="theme-toggle">Toggle Light/Dark Mode</button>
-            </footer>
-        </aside>
-
-        <!-- --- Main Chat Area --- -->
-        <main id="main-chat">
-            <header id="chat-header">
-                <!-- Chat header will be populated by JavaScript -->
-                <div id="chat-header-details">
-                    <button id="hamburger-menu" title="Toggle Menu">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                        </svg>
-                    </button>
-                    <!-- e.g., <div class="avatar">...</div> <div>Name, Role</div> -->
-                </div>
-            </header>
-            
-            <div id="message-list-wrapper">
-                <div id="message-list">
-                    <!-- Messages will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <div id="typing-indicator">
-                <span id="typing-indicator-text"></span>
-            </div>
-
-            <div id="message-form-wrapper">
-                <form id="message-form">
-                    <textarea id="message-input" placeholder="Message..." rows="1"></textarea>
-                    <button type="submit" title="Send Message">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-                    </button>
-                </form>
-            </div>
-            
-            <div id="mobile-menu-backdrop"></div>
-        </main>
+    <!-- Immersive Cosmic Background -->
+    <div class="cosmic-bg">
+        <div class="absolute top-[-10%] left-[-5%] w-[70%] h-[70%] bg-blue-600/10 blur-[180px] rounded-full animate-pulse"></div>
+        <div class="absolute bottom-[-5%] right-[-5%] w-[60%] h-[60%] bg-indigo-600/10 blur-[180px] rounded-full"></div>
+        <div class="noise-overlay"></div>
     </div>
 
-    <!-- --- Admin Panel (Hidden) --- -->
-    <div id="admin-panel" class="hidden">
-        <div id="admin-modal">
-            <button id="admin-close">&times;</button>
-            <h2>Admin Panel</h2>
-            
-            <div class="admin-section">
-                <label for="admin-persona-select">Send Message As:</label>
-                <select id="admin-persona-select" class="admin-select">
-                    <!-- Personas will be populated by JavaScript -->
-                </select>
-                <textarea id="admin-message-input" class="admin-input" rows="2" placeholder="Type a fake message..."></textarea>
-                <button id="admin-send-button" class="admin-button" style="margin-top: 10px;">Send Message</button>
-            </div>
-            
-            <div class="admin-section">
-                <label>Trigger Staff Actions:</label>
-                <div class="admin-button-group">
-                    <button id="admin-trigger-morning" class="admin-button-secondary">Trigger Morning Summary</button>
-                    <button id="admin-trigger-progress" class="admin-button-secondary">Trigger Progress Update</button>
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 py-8">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <!-- Redesigned Logo Section -->
+            <div class="flex items-center gap-5 group cursor-pointer">
+                <div class="relative w-14 h-14 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                    <!-- Outer Orbital Rings -->
+                    <div class="absolute inset-0 border-2 border-blue-500/20 rounded-full animate-[spin_12s_linear_infinite]"></div>
+                    <div class="absolute inset-1 border border-indigo-400/10 rounded-full animate-[spin_8s_linear_infinite_reverse]"></div>
+                    
+                    <!-- Core Mark -->
+                    <div class="relative w-10 h-10 bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-950 rounded-xl flex items-center justify-center shadow-[0_0_30px_rgba(37,99,235,0.4)] ring-1 ring-white/20 overflow-hidden">
+                        <!-- Glassmorphism shine -->
+                        <div class="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-gradient-to-br from-white/20 via-transparent to-transparent rotate-45"></div>
+                        <span class="text-white font-black text-2xl italic tracking-tighter relative z-10">C</span>
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-2xl font-black tracking-[0.1em] text-white uppercase leading-tight italic">Cosmos</span>
+                    <span class="text-[9px] font-bold tracking-[0.5em] text-blue-400 uppercase opacity-80">Group Holdings</span>
                 </div>
             </div>
-            
-            <div class="admin-section">
-                <label>Chat Management (Permanent):</label>
-                <div class="admin-button-group">
-                    <button id="admin-clear-chat" class="admin-button-danger">Clear All Chat History</button>
+
+            <div class="hidden lg:flex items-center gap-10 text-[11px] font-black uppercase tracking-[0.25em]">
+                <a href="#about" class="hover:text-blue-400 transition-colors">Our Ethos</a>
+                <a href="#strategy" class="hover:text-blue-400 transition-colors">Infrastructure</a>
+                <a href="#flagship" class="hover:text-blue-400 transition-colors">Flagship</a>
+                <a href="#leadership" class="hover:text-blue-400 transition-colors">Leadership</a>
+                <button class="bg-white text-slate-900 px-8 py-3 rounded-full hover:bg-blue-600 hover:text-white transition-all shadow-xl font-bold uppercase tracking-widest text-[10px]">
+                    Investor Relations
+                </button>
+            </div>
+
+            <button class="lg:hidden text-white" id="menu-btn">
+                <i data-lucide="menu" size="32"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-40 bg-[#020617] transition-all duration-700 translate-x-full lg:hidden">
+        <div class="flex flex-col items-start justify-center h-full gap-8 px-12 text-4xl font-black uppercase italic tracking-tighter">
+            <button class="absolute top-8 right-8 text-white" id="close-btn">
+                <i data-lucide="x" size="32"></i>
+            </button>
+            <a href="#about" class="mobile-link">Ethos</a>
+            <a href="#strategy" class="mobile-link">Infrastructure</a>
+            <a href="#flagship" class="mobile-link">Flagship</a>
+            <a href="#leadership" class="mobile-link">Leadership</a>
+            <div class="h-px w-full bg-slate-800 my-4"></div>
+            <button class="text-blue-500 text-xl font-bold uppercase tracking-widest">Connect with HQ</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative pt-48 pb-32 md:pt-64 md:pb-48 px-6 overflow-hidden text-left md:text-center">
+        <div class="container mx-auto relative z-10">
+            <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-blue-500/5 border border-blue-500/20 text-blue-400 text-[11px] font-black uppercase tracking-[0.4em] mb-12 animate-fade-in shadow-xl">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                Universal Media Governance
+            </div>
+            <h1 class="text-7xl md:text-[10rem] font-black text-white mb-12 leading-[0.8] tracking-tighter uppercase italic drop-shadow-2xl">
+                Powering <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-white to-cyan-400">
+                    The Horizon.
+                </span>
+            </h1>
+            <p class="max-w-3xl mx-auto text-slate-400 text-lg md:text-2xl mb-16 leading-relaxed font-light">
+                Cosmos Group Holdings is a multi-national conglomerate orchestrating the world's most sophisticated digital ecosystems. We build the architecture of universal influence.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                <a href="#flagship" class="group px-12 py-6 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-500 transition-all shadow-2xl shadow-blue-600/30 flex items-center justify-center gap-4">
+                    Explore Portfolio <i data-lucide="arrow-up-right" class="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
+                </a>
+                <button class="px-12 py-6 bg-slate-900/40 backdrop-blur-md text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all border border-slate-700/50 hover:bg-slate-800 shadow-xl">
+                    Corporate Overview
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Strategy Section -->
+    <section id="strategy" class="py-32 border-y border-slate-900 bg-slate-900/10">
+        <div class="container mx-auto px-6">
+            <div class="grid lg:grid-cols-12 gap-16">
+                <div class="lg:col-span-5">
+                    <h3 class="text-blue-500 font-bold uppercase tracking-[0.5em] text-[10px] mb-6">Group Infrastructure</h3>
+                    <h2 class="text-4xl md:text-6xl font-black text-white mb-10 tracking-tighter uppercase italic">Institutional <br> Excellence.</h2>
+                    <div class="space-y-4" id="strategy-tabs">
+                        <!-- Strategy Tabs will be injected here -->
+                    </div>
+                </div>
+                <div class="lg:col-span-7 flex flex-col justify-center">
+                    <div id="strategy-display" class="p-10 md:p-16 bg-slate-900/40 rounded-[40px] border border-slate-800 relative overflow-hidden group min-h-[400px]">
+                        <!-- Strategy Content will be injected here -->
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Notification Sound (Base64 encoded to keep it in one file) -->
-    <audio id="notification-sound" src="data:audio/mpeg;base64,SUQzBAAAAAAAIvarimNADAAAAAAAADYtVGl0bGUAAAAHAAAAQmxpcCBGS0lUczBAAAAAAAAPY0NNRDsAAACmAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATEFNRSAzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRSAzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////AABtAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVLTEFNRSAlBITI1MTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////AABtAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDSWa/ADAAAAQ/GENBKpYAgAAGkAAAAAAAAAAAAAABpAAAAAAAAAAAAAABQQBAAABQAAPAAYAAAAIAAAABVVVVVVVVVVVVVVVVVVVVDYTExVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDNVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVPRO1AAAAAAAAAAAAAAAADSAAABpAAAAAAAAAAAAAABpAAAAAAAAAAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVPosition in file: 1,940 bytes
-VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVPOST /v1Am/classic_Fm?Id=ABESuQBpF08A&Reason=Merge&Revision=8&t=1730072719277033&zx=1730072719277033 HTTP/1.1
-Host: docs.google.com
-Content-Type: application/json; charset=UTFF-F8
-Content-Length: 1048
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-X-Same-Domain: 1
-Cookie: [REDACTED]
-Connection: keep-alive
+    </section>
 
-[1,1,[[1,1940,"[5,1,[13,\"VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\"]]]],4]
- HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-Vary: Origin
-Vary: X-Origin
-Vary: Referer
-Content-Encoding: gzip
-Date: Fri, 27 Oct 2023 23:05:22 GMT
-Server: ESF
-Cache-Control: private
-X-XSS-Protection: 0
-X-Frame-Options: SAMEORIGIN
-X-Content-Type-Options: nosniff
-Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-Connection: close
-Content-Length: 61
+    <!-- Flagship Section -->
+    <section id="flagship" class="py-40 relative">
+        <div class="container mx-auto px-6 text-center">
+            <div class="w-px h-24 bg-gradient-to-b from-blue-600 to-transparent mx-auto mb-12"></div>
+            <h2 class="text-4xl md:text-8xl font-black text-white tracking-tighter uppercase italic leading-none mb-4">
+                FEASIBILITY <br> MEDIA
+            </h2>
+            <p class="text-blue-400 font-bold tracking-[0.6em] text-xs uppercase mb-24">The Flagship Subsidiary</p>
 
-[1,1,[[1,3880,""]]]
-VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVLgGg=="></audio>
-    
+            <div class="grid lg:grid-cols-2 gap-8 items-stretch text-left">
+                <div class="p-12 bg-gradient-to-br from-blue-600 to-indigo-800 rounded-[40px] text-white flex flex-col justify-between shadow-3xl shadow-blue-600/20">
+                    <div>
+                        <i data-lucide="award" class="w-12 h-12 mb-10 text-white/80"></i>
+                        <h3 class="text-3xl font-black mb-6 uppercase tracking-tighter italic">Tactical Execution Hub</h3>
+                        <p class="text-blue-100 text-lg leading-relaxed mb-12 opacity-90">
+                            As the primary operational arm of Cosmos, Feasibility Media translates high-level corporate vision into market-dominant media campaigns. It is the engine that drives our universal footprint.
+                        </p>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-end border-b border-white/20 pb-4">
+                            <span class="font-bold uppercase tracking-widest text-xs">Market Reach</span>
+                            <span class="text-4xl font-black tracking-tighter italic">GLOBAL</span>
+                        </div>
+                        <div class="flex justify-between items-end border-b border-white/20 pb-4">
+                            <span class="font-bold uppercase tracking-widest text-xs">Campaign Velocity</span>
+                            <span class="text-4xl font-black tracking-tighter italic">ACCELERATED</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid gap-8">
+                    <div class="p-10 bg-slate-900 border border-slate-800 rounded-[40px] hover:border-blue-500/50 transition-all">
+                        <div class="flex justify-between items-start mb-10">
+                            <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-blue-400">
+                                <i data-lucide="zap" size="24"></i>
+                            </div>
+                            <a href="https://feasibilitymedia.in" target="_blank" class="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 text-slate-500 hover:text-white transition-colors">
+                                Access Portal <i data-lucide="external-link" size="14"></i>
+                            </a>
+                        </div>
+                        <h4 class="text-xl font-bold text-white mb-4 uppercase tracking-widest">Media Architecture</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed mb-6">Propelling brands through the digital noise with surgical precision and creative disruption.</p>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="px-4 py-1.5 rounded-full bg-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Performance</span>
+                            <span class="px-4 py-1.5 rounded-full bg-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Social</span>
+                            <span class="px-4 py-1.5 rounded-full bg-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Creative</span>
+                        </div>
+                    </div>
+                    <div class="p-10 bg-slate-900 border border-slate-800 rounded-[40px] hover:border-blue-500/50 transition-all flex items-center justify-between">
+                        <div>
+                            <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-widest italic">Performance Metrics</h4>
+                            <p class="text-slate-500 text-sm">Real-time engagement tracking across 14 markets.</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-4xl font-black text-blue-500 tracking-tighter italic">3.5x</span>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Avg Growth</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leadership Section -->
+    <section id="leadership" class="py-32 bg-slate-900/30">
+        <div class="container mx-auto px-6">
+            <div class="max-w-6xl mx-auto text-left">
+                <div class="grid md:grid-cols-2 gap-20 items-center">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-blue-600/30 blur-[120px] rounded-full"></div>
+                        <div class="relative aspect-[3/4] rounded-[50px] overflow-hidden border border-slate-700 bg-slate-800 shadow-3xl">
+                            <div class="absolute inset-0 flex items-center justify-center opacity-10">
+                                <i data-lucide="users" style="width: 300px; height: 300px;"></i>
+                            </div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                            <div class="absolute inset-0 p-12 flex flex-col justify-end">
+                                <h3 class="text-4xl font-black text-white uppercase italic tracking-tighter">Aryaveer Mishra</h3>
+                                <p class="text-blue-500 font-bold tracking-[0.4em] text-xs uppercase mb-6">Founder & Chairman</p>
+                                <div class="flex gap-4">
+                                    <a href="https://www.linkedin.com/in/aryaveer-mishra" target="_blank" class="w-12 h-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all">
+                                        <i data-lucide="linkedin" size="20"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-blue-500 font-bold uppercase tracking-[0.5em] text-[10px] mb-6 text-left">The Office of the Chairman</h3>
+                        <h2 class="text-4xl md:text-6xl font-black text-white mb-10 tracking-tighter uppercase italic leading-tight text-left">Leading the <br> New Standard.</h2>
+                        <div class="relative mb-12">
+                            <i data-lucide="quote" class="absolute -top-8 -left-8 text-blue-500/10 w-20 h-20"></i>
+                            <p class="text-2xl font-light text-slate-300 leading-relaxed italic relative z-10">
+                                "Cosmos was not built to follow markets—it was built to define them. We hold the tools of the future, and we apply them with the discipline of the past."
+                            </p>
+                        </div>
+                        <div class="space-y-8 text-slate-400 text-lg leading-relaxed">
+                            <p>Aryaveer Mishra’s leadership is defined by a relentless focus on "Feasibility"—the logical vetting of every ambitious vision. Under his guidance, the group has evolved from a media boutique into a globally recognized holding powerhouse.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Hub -->
+    <section class="py-24 border-t border-slate-900">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-end mb-16 text-left">
+                <div>
+                    <h3 class="text-blue-500 font-bold uppercase tracking-[0.5em] text-[10px] mb-4">Insights hub</h3>
+                    <h2 class="text-3xl font-black text-white uppercase italic tracking-tighter">Press & Global Reports</h2>
+                </div>
+                <button class="hidden md:flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors">
+                    View Newsroom <i data-lucide="chevron-right" size="14"></i>
+                </button>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 text-left" id="news-grid">
+                <!-- News items will be injected here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="py-40 relative overflow-hidden bg-blue-700">
+        <div class="absolute inset-0 bg-black/10 backdrop-blur-[2px]"></div>
+        <div class="container mx-auto px-6 relative z-10 text-left">
+            <div class="max-w-5xl mx-auto bg-white rounded-[50px] p-12 md:p-24 shadow-4xl grid md:grid-cols-2 gap-20 items-center">
+                <div>
+                    <h2 class="text-slate-900 text-5xl font-black uppercase tracking-tighter italic mb-8">Initiate <br> Contact.</h2>
+                    <p class="text-slate-600 text-lg mb-12">For strategic partnerships, institutional inquiries, or corporate governance matters, connect with the Chairman's Office.</p>
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-6 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                            <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600">
+                                <i data-lucide="mail" size="20"></i>
+                            </div>
+                            <div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">General HQ</div>
+                                <div class="text-slate-900 font-bold">info@cosmosholdings.global</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <input type="text" placeholder="Full Name / Entity" class="w-full px-8 py-5 bg-slate-100 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all font-bold placeholder:text-slate-400 text-slate-900">
+                    <textarea placeholder="Nature of Inquiry" rows="4" class="w-full px-8 py-5 bg-slate-100 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all font-bold placeholder:text-slate-400 text-slate-900"></textarea>
+                    <button class="w-full py-6 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-blue-600 transition-all shadow-xl">Submit to Governance</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="pt-32 pb-12 bg-black border-t border-slate-900 text-left">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-16 mb-24">
+                <div class="col-span-1 lg:col-span-2">
+                    <!-- Redesigned Footer Logo -->
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="relative w-12 h-12 flex items-center justify-center">
+                            <div class="absolute inset-0 border border-blue-500/30 rounded-full animate-spin-slow"></div>
+                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                                <span class="text-white font-black text-lg italic">C</span>
+                            </div>
+                        </div>
+                        <span class="text-2xl font-black tracking-tighter text-white uppercase italic">Cosmos <span class="text-blue-500 italic">Holdings</span></span>
+                    </div>
+                    <p class="text-slate-500 max-w-sm text-lg font-medium leading-relaxed mb-8">The global governing entity for market-disrupting digital assets. Strategically led by Aryaveer Mishra.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-black mb-10 text-xs uppercase tracking-[0.2em]">Institutional</h4>
+                    <ul class="space-y-4 text-slate-600 text-[11px] font-bold uppercase tracking-widest">
+                        <li><a href="#strategy" class="hover:text-blue-500 transition-colors">Group Strategy</a></li>
+                        <li><a href="#flagship" class="hover:text-blue-500 transition-colors">Feasibility Media</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Investor Relations</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-black mb-10 text-xs uppercase tracking-[0.2em]">Compliance</h4>
+                    <ul class="space-y-4 text-slate-600 text-[11px] font-bold uppercase tracking-widest">
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Privacy Protocol</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Terms of Governance</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-12 border-t border-slate-900 text-[9px] font-black uppercase tracking-[0.4em] text-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p>© 2024 Cosmos Group Holdings. All rights reserved.</p>
+                <p>System Status: Active</p>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        /**
-         * Feasibility Media - Internal Chat Simulation
-         * A single-file, vanilla JS application to simulate a realistic internal chat.
-         *
-         * Features:
-         * - Realistic UI (Slack/Teams inspired)
-         * - Light/Dark Mode
-         * - Mobile-First Responsive Design (w/ Hamburger Menu)
-         * - Message persistence via localStorage
-         * - 5 distinct "AI" personas with unique roles & tones
-         * - Advanced, prioritized reply logic
-         * - Multi-bubble replies for natural conversation
-         * - Proactive, unprompted messages from staff
-         * - Typing indicators with random delays
-         * - Hidden Admin Panel (Shift+A or 5-tap on title)
-         * - Notification sounds
-         */
-        
-        document.addEventListener('DOMContentLoaded', () => {
+        // Data
+        const strategies = [
+            {
+                title: "Strategic Intelligence",
+                icon: "cpu",
+                content: "At the core of Cosmos lies our Strategic Intelligence Unit (SIU). We leverage advanced predictive analytics to identify market shifts before they occur, ensuring Feasibility Media stays ahead of global trends.",
+                features: ["Market Arbitrage Analysis", "Sentiment Mapping", "Predictive Trend Modeling"]
+            },
+            {
+                title: "Capital & Growth",
+                icon: "trending-up",
+                content: "Cosmos provides the financial bedrock for aggressive expansion. We manage the capital flows that allow our flagship subsidiary to acquire top-tier talent and cutting-edge technology infrastructure.",
+                features: ["Global Resource Allocation", "M&A Advisory", "Scalability Engineering"]
+            },
+            {
+                title: "Governance & Ethics",
+                icon: "shield-check",
+                content: "We maintain rigorous standards of corporate governance. Every project executed by Feasibility Media is audited for ethical compliance and long-term brand safety.",
+                features: ["Brand Safety Protocols", "Ethical AI Usage", "Regulatory Compliance"]
+            }
+        ];
 
-            // --- 1. CONFIGURATION & STATE ---
+        const newsItems = [
+            { date: "Oct 2024", tag: "Expansion", title: "Cosmos Holdings Announces New Strategic Corridor for Media Growth." },
+            { date: "Sept 2024", tag: "Innovation", title: "Feasibility Media Integrates Proprietary AI Research from Cosmos Labs." },
+            { date: "Aug 2024", tag: "Leadership", title: "Chairman Aryaveer Mishra Outlines 2025 Vision for Universal Digital Access." }
+        ];
 
-            const CEO = {
-                id: 'ceo',
-                name: 'Aryaveer Mishra',
-                role: 'CEO (Admin)',
-                avatar: 'AM',
-                avatarColor: '#0d6efd'
-            };
+        // Initialization
+        window.onload = function() {
+            lucide.createIcons();
+            renderStrategies();
+            renderNews();
+            setupNavigation();
+            setupMenu();
+        };
 
-            const PERSONAS = {
-                'aston': {
-                    id: 'aston',
-                    name: 'Aston',
-                    role: 'Team Lead',
-                    avatar: 'A',
-                    avatarColor: '#198754',
-                },
-                'maya': {
-                    id: 'maya',
-                    name: 'Maya',
-                    role: 'Designer',
-                    avatar: 'M',
-                    avatarColor: '#6f42c1',
-                },
-                'ravi': {
-                    id: 'ravi',
-                    name: 'Ravi',
-                    role: 'Sales Head',
-                    avatar: 'R',
-                    avatarColor: '#dc3545',
-                },
-                'neha': {
-                    id: 'neha',
-                    name: 'Neha',
-                    role: 'Marketing',
-                    avatar: 'N',
-                    avatarColor: '#fd7e14',
-                },
-                'kabir': {
-                    id: 'kabir',
-                    name: 'Kabir',
-                    role: 'Freelancer (Video)',
-                    avatar: 'K',
-                    avatarColor: '#0dcaf0',
-                }
-            };
-            
-            /**
-             * Prioritized reply logic.
-             * The first rule in a persona's list that matches will be used.
-             * Replies are arrays of strings for multi-bubble messages.
-             */
-            const REPLY_LOGIC = {
-                'aston': [
-                    { keywords: ['morning summary', 'daily update', 'status'], reply: () => [
-                        `Morning. Here's the rundown:`,
-                        `Ravi is finalizing the 'Stellar' contract.`,
-                        `Maya is on the new 'Omega' mockups.`,
-                        `Neha's campaign for 'Apex' is live and tracking 5% above projection.`,
-                        `Kabir is editing video 2. No blockers.`
-                    ]},
-                    { keywords: ['progress', 'update', 'status'], reply: () => [`Everything is on track. ${['Ravi', 'Maya', 'Neha'][Math.floor(Math.random() * 3)]} is wrapping up their key task for the day.`, `No issues to report. Should I get a detailed update from the team?`]},
-                    { keywords: ['blocker', 'issue', 'problem'], reply: ["Looking into it.", "What's the context?", "I'll check with the team and get back to you."]},
-                    { keywords: ['thanks', 'thank you', 'thx'], reply: ["You're welcome.", "No problem."]},
-                    { keywords: ['hi', 'hello', 'hey'], reply: ["Hello.", "Morning."]},
-                    { keywords: ['generic'], reply: ["Got it.", "Understood.", "Will do.", "On it.", "Okay, I'll follow up.", "Acknowledged."]}
-                ],
-                'maya': [
-                    { keywords: ['design', 'mockup', 'creative', 'logo', 'brand'], reply: ["On it! ✨", "Just finishing up the wireframes.", "Sending you the new version now. Let me know what you think!", "I have a few ideas for that, will mock them up this afternoon."]},
-                    { keywords: ['feedback', 'revision', 'change'], reply: ["Got the feedback!", "Making those changes now. Should be quick.", "No problem, I'll send over a v2 soon."]},
-                    { keywords: ['omega'], reply: ["The Omega mockups are looking clean. ✨", "I'm just finishing the mobile responsive views for Omega."]},
-                    { keywords: ['thanks', 'thank you', 'thx'], reply: ["Anytime! 😊", "Happy to help!"]},
-                    { keywords: ['hi', 'hello', 'hey'], reply: ["Hey! 👋", "Morning!"]},
-                    { keywords: ['generic'], reply: ["Okay, got it!", "Sure thing!", "Sounds good. 👍"]}
-                ],
-                'ravi': [
-                    { keywords: ['sales', 'target', 'quota'], reply: () => [
-                        `We're looking strong. Q${Math.ceil((new Date().getMonth() + 1) / 3)} is tracking at ${Math.floor(Math.random() * 10) + 95}% of target.`,
-                        `'Stellar Solutions' is set to close this week. That's a 15k MRR win. 🚀`
-                    ]},
-                    { keywords: ['lead', 'prospect'], reply: ["Leads are solid. Neha's new campaign is driving a lot of MQLs.", "Following up with 3 high-intent prospects today."]},
-                    { keywords: ['client', 'contract', 'deal'], reply: ["'Stellar' contract is with legal. Should be signed by EOD.", "Just got off a call with 'Apex', they're happy with the progress."]},
-                    { keywords: ['thanks', 'thank you', 'thx'], reply: ["Cheers.", "All good."]},
-                    { keywords: ['hi', 'hello', 'hey'], reply: ["Morning.", "Hey."]},
-                    { keywords: ['generic'], reply: ["Will do.", "Confirmed.", "Tracking it."]}
-                ],
-                'neha': [
-                    { keywords: ['marketing', 'campaign', 'ads', 'cpc', 'ctr'], reply: () => [
-                        `'Apex' campaign CTR is up 0.5% after the new ad copy.`,
-                        `CPC is holding steady at $${(Math.random() * 2 + 1.5).toFixed(2)}.`,
-                        `I'm analyzing the funnel for drop-off points now.`
-                    ]},
-                    { keywords: ['report', 'stats', 'data', 'analytics'], reply: ["Just pulling the weekly report.", "Analytics are looking good. Will send the full summary by 4 PM.", "Data is processing, one sec."]},
-                    { keywords: ['social', 'content', 'blog'], reply: ["New blog post is scheduled for tomorrow.", "Social engagement is up 12% week-over-week. The new video content is working well."]},
-                    { keywords: ['thanks', 'thank you', 'thx'], reply: ["My pleasure!", "You got it!"]},
-                    { keywords: ['hi', 'hello', 'hey'], reply: ["Hi! 😄", "Hey there!"]},
-                    { keywords: ['generic'], reply: ["Sounds good!", "I'll get right on that.", "Okay, adding it to my list."]}
-                ],
-                'kabir': [
-                    { keywords: ['video', 'edit', 'render'], reply: ["yep, on it.", "exporting video 2 now.", "should be done in ~1hr.", "render queue is full, might be a couple hours."]},
-                    { keywords: ['footage', 'assets'], reply: ["got the assets.", "downloading the new footage now."]},
-                    { keywords: ['revision', 'change', 'feedback'], reply: ["kk", "changes look easy.", "will get it done."]},
-                    { keywords: ['thanks', 'thank you', 'thx'], reply: ["np", "👍"]},
-                    { keywords: ['hi', 'hello', 'hey'], reply: ["hey", "mornin"]},
-                    { keywords: ['generic'], reply: ["ok", "got it", "sure", "yep."]}
-                ]
-            };
-            
-            /**
-             * Unprompted messages to be sent randomly.
-             */
-            const PROACTIVE_MESSAGES = {
-                'aston': [
-                    ["Just a heads-up, I'm moving the team sync to 3 PM today."],
-                    ["Team, please make sure your timesheets for last week are submitted by EOD."]
-                ],
-                'maya': [
-                    ["Just had a burst of inspiration for the 'Omega' landing page! ✨", "Working on a quick new concept."],
-                    ["Ooh, has anyone seen the new Figma update? 🔥"]
-                ],
-                'ravi': [
-                    ["BOOM! 🚀 'Stellar Solutions' just signed.", "That's another 15k MRR on the board! Great work all."],
-                    ["Just got a new high-intent lead from the website. Passing to the team now."]
-                ],
-                'neha': [
-                    ["Weekly analytics are in!", "The 'Apex' campaign's conversion rate is up 8%!", "Full report will be on your desks by 3 PM."],
-                    ["The new blog post just went live. Please share!"]
-                ],
-                'kabir': [
-                    ["Heads up, that last render failed.", "Restarting it now, but it'll add about 45 mins."],
-                    ["Video 2 (final cut) is uploaded to Drive.", "link: [project_drive_link]"]
-                ]
-            };
-
-            // App state
-            let allMessages = {}; // { 'personaId': [messageObj, messageObj], ... }
-            let currentChatId = 'aston';
-            let typingTimers = {};
-            let adminTapCount = 0;
-            let adminTapTimer = null;
-            let proactiveInterval = null;
-
-            // DOM Elements
-            const sidebarEl = document.getElementById('sidebar');
-            const dmListEl = document.getElementById('dm-list');
-            const chatHeaderDetailsEl = document.getElementById('chat-header-details');
-            const messageListWrapperEl = document.getElementById('message-list-wrapper');
-            const messageListEl = document.getElementById('message-list');
-            const messageFormEl = document.getElementById('message-form');
-            const messageInputEl = document.getElementById('message-input');
-            const typingIndicatorTextEl = document.getElementById('typing-indicator-text');
-            const themeToggleBtn = document.getElementById('theme-toggle');
-            const notificationSoundEl = document.getElementById('notification-sound');
-            const hamburgerMenuBtn = document.getElementById('hamburger-menu');
-            const mobileBackdropEl = document.getElementById('mobile-menu-backdrop');
-            const appTitleEl = document.getElementById('app-title');
-            
-            // Admin Panel DOM Elements
-            const adminPanelEl = document.getElementById('admin-panel');
-            const adminCloseBtn = document.getElementById('admin-close');
-            const adminPersonaSelectEl = document.getElementById('admin-persona-select');
-            const adminMessageInputEl = document.getElementById('admin-message-input');
-            const adminSendBtn = document.getElementById('admin-send-button');
-            const adminTriggerMorningBtn = document.getElementById('admin-trigger-morning');
-            const adminTriggerProgressBtn = document.getElementById('admin-trigger-progress');
-            const adminClearChatBtn = document.getElementById('admin-clear-chat');
-
-            // --- 2. INITIALIZATION ---
-
-            /**
-             * Main entry point. Initializes the application.
-             */
-            function initApp() {
-                // Load theme from localStorage
-                const savedTheme = localStorage.getItem('fm-chat-theme');
-                if (savedTheme) {
-                    document.body.className = savedTheme;
-                }
-                
-                loadMessages();
-                renderSidebar();
-                renderAdminPanel();
-                selectChat(currentChatId);
-                
-                addEventListeners();
-                
-                // If chat history is empty, seed it to look alive
-                if (Object.keys(allMessages).length === 0) {
-                    seedInitialChat();
+        function setupNavigation() {
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('nav-scrolled');
                 } else {
-                    renderMessages();
+                    navbar.classList.remove('nav-scrolled');
                 }
-                
-                startProactiveTimer();
-                
-                console.log("Feasibility Media Chat simulation loaded.");
-                console.log("Hint: Press Shift+A or tap the title 5 times to open admin panel.");
-            }
+            });
+        }
 
-            /**
-             * Adds all necessary event listeners
-             */
-            function addEventListeners() {
-                messageFormEl.addEventListener('submit', handleMessageSubmit);
-                themeToggleBtn.addEventListener('click', toggleTheme);
-                
-                // Mobile Menu Listeners
-                hamburgerMenuBtn.addEventListener('click', openMobileMenu);
-                mobileBackdropEl.addEventListener('click', closeMobileMenu);
+        function setupMenu() {
+            const menuBtn = document.getElementById('menu-btn');
+            const closeBtn = document.getElementById('close-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
 
-                // Auto-resize textarea
-                messageInputEl.addEventListener('input', () => {
-                    messageInputEl.style.height = 'auto';
-                    messageInputEl.style.height = (messageInputEl.scrollHeight) + 'px';
-                });
-                
-                // Admin Panel Listeners
-                document.addEventListener('keydown', handleAdminKeydown);
-                appTitleEl.addEventListener('click', handleAdminTap); // Mobile admin trigger
-                adminCloseBtn.addEventListener('click', closeAdminPanel);
-                adminSendBtn.addEventListener('click', handleAdminSend);
-                adminTriggerMorningBtn.addEventListener('click', triggerMorningSummary);
-                adminTriggerProgressBtn.addEventListener('click', triggerProgressUpdate);
-                adminClearChatBtn.addEventListener('click', handleAdminClearChat);
-            }
+            const toggle = () => mobileMenu.classList.toggle('translate-x-full');
+            
+            menuBtn.addEventListener('click', toggle);
+            closeBtn.addEventListener('click', toggle);
+            mobileLinks.forEach(link => link.addEventListener('click', toggle));
+        }
 
-            // --- 3. RENDERING & UI ---
+        function renderStrategies() {
+            const tabsContainer = document.getElementById('strategy-tabs');
+            const displayContainer = document.getElementById('strategy-display');
 
-            /**
-             * Renders the list of DMs in the sidebar
-             */
-            function renderSidebar() {
-                dmListEl.innerHTML = '';
-                Object.values(PERSONAS).forEach(persona => {
-                    const li = document.createElement('li');
-                    li.className = 'dm-item';
-                    li.dataset.id = persona.id;
-                    li.innerHTML = `
-                        <div class="avatar" style="background-color: ${persona.avatarColor};">${persona.avatar}</div>
-                        <span>${persona.name}</span>
-                        <div class="unread-dot"></div>
-                    `;
-                    li.addEventListener('click', () => selectChat(persona.id));
-                    dmListEl.appendChild(li);
-                });
-            }
+            strategies.forEach((strat, index) => {
+                const btn = document.createElement('button');
+                btn.className = `strategy-tab w-full text-left p-6 rounded-2xl transition-all duration-500 border border-slate-800 bg-slate-900/50 ${index === 0 ? 'active' : ''}`;
+                btn.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="icon-container ${index === 0 ? 'text-white' : 'text-blue-400'}">
+                            <i data-lucide="${strat.icon}" class="w-6 h-6"></i>
+                        </div>
+                        <span class="font-black uppercase tracking-widest text-sm">${strat.title}</span>
+                    </div>
+                `;
+                btn.onclick = () => switchStrategy(index);
+                tabsContainer.appendChild(btn);
+            });
 
-            /**
-             * Renders the chat header for the currently selected chat
-             */
-            function renderChatHeader() {
-                const persona = PERSONAS[currentChatId];
-                if (!persona) return;
-                
-                chatHeaderDetailsEl.innerHTML = `
-                    <button id="hamburger-menu" title="Toggle Menu">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                        </svg>
+            switchStrategy(0); // Initial render
+            lucide.createIcons();
+        }
+
+        function switchStrategy(index) {
+            const tabs = document.querySelectorAll('.strategy-tab');
+            const displayContainer = document.getElementById('strategy-display');
+            const strat = strategies[index];
+
+            tabs.forEach((tab, i) => {
+                if (i === index) tab.classList.add('active');
+                else tab.classList.remove('active');
+            });
+
+            displayContainer.innerHTML = `
+                <div class="absolute top-0 right-0 p-12 opacity-5 scale-150 group-hover:rotate-12 transition-transform duration-1000">
+                    <i data-lucide="${strat.icon}" style="width: 100px; height: 100px;"></i>
+                </div>
+                <h3 class="text-2xl font-black text-white mb-8 uppercase italic tracking-tighter underline underline-offset-8 decoration-blue-600">
+                    ${strat.title}
+                </h3>
+                <p class="text-xl text-slate-300 leading-relaxed mb-10">
+                    ${strat.content}
+                </p>
+                <div class="grid sm:grid-cols-2 gap-4 text-left">
+                    ${strat.features.map(feat => `
+                        <div class="flex items-center gap-3 text-sm font-bold text-blue-400 uppercase tracking-widest">
+                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                            ${feat}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderNews() {
+            const grid = document.getElementById('news-grid');
+            newsItems.forEach(news => {
+                const card = document.createElement('div');
+                card.className = "p-8 rounded-3xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all group cursor-pointer text-left";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest px-3 py-1 bg-blue-500/5 rounded-full border border-blue-500/20">${news.tag}</span>
+                        <span class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">${news.date}</span>
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-6 group-hover:text-blue-400 transition-colors">${news.title}</h4>
+                    <button class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                        Read Release <i data-lucide="arrow-up-right" size="14"></i>
                     </button>
-                    <div class="avatar" style="background-color: ${persona.avatarColor};">${persona.avatar}</div>
-                    <div class="user-details">
-                        <div class="user-name">${persona.name}</div>
-                        <div class="user-role">${persona.role}</div>
-                    </div>
                 `;
-                // Re-add hamburger listener since we just overwrote it
-                document.getElementById('hamburger-menu').addEventListener('click', openMobileMenu);
-            }
-
-            /**
-             * Renders all messages for the current chat
-             */
-            function renderMessages() {
-                messageListEl.innerHTML = '';
-                const messages = allMessages[currentChatId] || [];
-                
-                messages.forEach(msg => {
-                    messageListEl.appendChild(createMessageElement(msg));
-                });
-                
-                scrollToBottom();
-            }
-
-            /**
-             * Creates an HTML element for a single message object
-             * @param {object} msg - The message object
-             * @returns {HTMLElement} The message group element
-             */
-            function createMessageElement(msg) {
-                const persona = msg.senderId === 'ceo' ? CEO : PERSONAS[msg.senderId];
-                const isOwn = msg.senderId === 'ceo';
-                
-                const groupEl = document.createElement('div');
-                groupEl.className = `message-group ${isOwn ? 'is-own' : ''}`;
-                groupEl.dataset.messageId = msg.id; // For editing/deleting
-                
-                groupEl.innerHTML = `
-                    <div class="avatar" style="background-color: ${persona.avatarColor};">${persona.avatar}</div>
-                    <div class="message-details">
-                        <div class="message-header">
-                            <span class="message-sender">${persona.name}</span>
-                            <span class="message-timestamp">${formatTimestamp(msg.timestamp)}</span>
-                        </div>
-                        <div class="message-bubble">
-                            ${msg.text.map(p => `<p>${p}</p>`).join('')}
-                        </div>
-                    </div>
-                `;
-                return groupEl;
-            }
-
-            /**
-             * Sets the active chat, renders header and messages
-             * @param {string} personaId - The ID of the persona to chat with
-             */
-            function selectChat(personaId) {
-                currentChatId = personaId;
-                
-                // Update sidebar active state
-                document.querySelectorAll('.dm-item').forEach(el => {
-                    el.classList.toggle('active', el.dataset.id === personaId);
-                    if (el.dataset.id === personaId) {
-                        el.classList.remove('unread'); // Mark as read
-                    }
-                });
-                
-                renderChatHeader();
-                renderMessages();
-                messageInputEl.focus();
-                
-                // Close mobile menu on chat selection
-                closeMobileMenu();
-            }
-
-            /**
-             * Scrolls the message list to the bottom
-             */
-            function scrollToBottom() {
-                messageListWrapperEl.scrollTop = messageListWrapperEl.scrollHeight;
-            }
-
-            /**
-             * Shows the typing indicator
-             * @param {string} personaName - Name of the typing person
-             */
-            function showTypingIndicator(personaName) {
-                typingIndicatorTextEl.innerHTML = `
-                    ${personaName} is typing
-                    <span class="typing-dots">
-                        <span></span><span></span><span></span>
-                    </span>
-                `;
-                typingIndicatorTextEl.style.opacity = '1';
-            }
-
-            /**
-             * Hides the typing indicator
-             */
-            function hideTypingIndicator() {
-                typingIndicatorTextEl.style.opacity = '0';
-                typingIndicatorTextEl.innerHTML = '';
-            }
-
-            /**
-             * Formats a timestamp into a human-readable time
-             * @param {number} timestamp - The message timestamp
-             * @returns {string} Formatted time string
-             */
-            function formatTimestamp(timestamp) {
-                const date = new Date(timestamp);
-                const today = new Date();
-                const yesterday = new Date(today.getTime() - 86400000);
-
-                const time = date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-
-                if (date.toLocaleDateString() === today.toLocaleDateString()) {
-                    return time;
-                }
-                if (date.toLocaleDateString() === yesterday.toLocaleDateString()) {
-                    return `Yesterday at ${time}`;
-                }
-                return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ` at ${time}`;
-            }
-            
-            /**
-             * Plays the notification sound
-             */
-            function playNotificationSound() {
-                notificationSoundEl.currentTime = 0;
-                notificationSoundEl.play().catch(e => console.log("Audio play failed. User interaction needed."));
-            }
-
-            // --- 4. MESSAGE & SIMULATION LOGIC ---
-
-            /**
-             * Handles the user (CEO) sending a message
-             * @param {Event} e - The form submit event
-             */
-            function handleMessageSubmit(e) {
-                e.preventDefault();
-                const text = messageInputEl.value.trim();
-                if (!text) return;
-
-                // Add user's message
-                addMessage(currentChatId, 'ceo', Date.now(), [text]);
-                
-                // Trigger bot reply
-                triggerBotReply(currentChatId, text);
-
-                // Clear input
-                messageInputEl.value = '';
-                messageInputEl.style.height = '48px';
-            }
-            
-            /**
-             * Adds a new message to the state and UI
-             * @param {string} chatId - The chat to add the message to
-             * @param {string} senderId - 'ceo' or a persona ID
-             * @param {number} timestamp - The message timestamp
-             * @param {Array<string>} textBubbles - An array of message text bubbles
-             * @param {boolean} [isProactive=false] - If true, this is a proactive message
-             */
-            function addMessage(chatId, senderId, timestamp, textBubbles, isProactive = false) {
-                const msg = {
-                    id: `msg_${timestamp}_${Math.random()}`,
-                    senderId: senderId,
-                    timestamp: timestamp,
-                    text: textBubbles // Always store as an array
-                };
-
-                if (!allMessages[chatId]) {
-                    allMessages[chatId] = [];
-                }
-                allMessages[chatId].push(msg);
-                saveMessages();
-
-                // Only render if it's for the current chat
-                if (chatId === currentChatId) {
-                    messageListEl.appendChild(createMessageElement(msg));
-                    scrollToBottom();
-                }
-
-                // Show unread dot if it's not the current chat and not from the CEO
-                if (chatId !== currentChatId && senderId !== 'ceo') {
-                    const dmItem = document.querySelector(`.dm-item[data-id="${chatId}"]`);
-                    if (dmItem) {
-                        dmItem.classList.add('unread');
-                    }
-                }
-                
-                // Play sound for incoming messages
-                if (senderId !== 'ceo') {
-                    playNotificationSound();
-                }
-            }
-            
-            /**
-             * Triggers the "AI" persona's reply
-             * @param {string} personaId - The persona to reply
-             * @param {string} userText - The text the user sent
-             */
-            function triggerBotReply(personaId, userText) {
-                const persona = PERSONAS[personaId];
-                if (typingTimers[personaId]) {
-                    clearTimeout(typingTimers[personaId]);
-                }
-
-                const replyBubbles = getBotReply(personaId, userText);
-                const avgDelay = personaId === 'kabir' ? 6000 : 3000; // Kabir is slower
-                
-                // 1. Show "typing" indicator
-                const typingDelay = Math.random() * 1500 + 500; // 0.5s - 2s
-                typingTimers[personaId] = setTimeout(() => {
-                    showTypingIndicator(persona.name);
-                    
-                    // 2. Wait to "send" the message
-                    const replyDelay = Math.random() * (avgDelay / 2) + (avgDelay / 2); // 3-6s for Kabir, 1.5-3s for others
-                    
-                    typingTimers[personaId] = setTimeout(() => {
-                        hideTypingIndicator();
-                        // 3. Handle sending the message(s)
-                        handleBotReplySending(personaId, persona.name, replyBubbles);
-                        
-                    }, replyDelay);
-                    
-                }, typingDelay);
-            }
-            
-            /**
-             * Handles sending single or multi-bubble replies with natural delays
-             * @param {string} personaId
-             * @param {string} personaName
-             * @param {Array<string>} replyBubbles
-             */
-            function handleBotReplySending(personaId, personaName, replyBubbles) {
-                if (!replyBubbles || replyBubbles.length === 0) return;
-
-                // Send the first bubble immediately
-                addMessage(personaId, personaId, Date.now(), [replyBubbles[0]]);
-
-                // If there are more bubbles, send them with staggered delays
-                if (replyBubbles.length > 1) {
-                    let bubbleDelay = 0;
-                    for (let i = 1; i < replyBubbles.length; i++) {
-                        const bubble = replyBubbles[i];
-                        const delay = Math.random() * 1500 + 1000; // 1s - 2.5s between bubbles
-                        bubbleDelay += delay;
-                        
-                        setTimeout(() => {
-                            // Show typing indicator again
-                            showTypingIndicator(personaName);
-                            
-                            setTimeout(() => {
-                                // Hide typing and send next bubble
-                                hideTypingIndicator();
-                                addMessage(personaId, personaId, Date.now(), [bubble]);
-                            }, delay / 2); // Type for half the delay
-                            
-                        }, bubbleDelay - (delay / 2)); // Start typing before sending
-                    }
-                }
-            }
-
-
-            /**
-             * Finds the correct reply from the REPLY_LOGIC
-             * @param {string} personaId - The persona ID
-             * @param {string} userText - The user's message
-             * @returns {Array<string>} An array of message bubbles
-             */
-            function getBotReply(personaId, userText) {
-                const rules = REPLY_LOGIC[personaId];
-                if (!rules) return ["..."]; // Fallback for undefined persona
-                
-                const lowerText = userText.toLowerCase();
-
-                for (const rule of rules) {
-                    if (rule.keywords.includes('generic')) {
-                        // Handle generic fallback
-                        const reply = rule.reply[Math.floor(Math.random() * rule.reply.length)];
-                        return [reply]; // Generic replies are single bubbles
-                    }
-                    
-                    for (const keyword of rule.keywords) {
-                        if (lowerText.includes(keyword)) {
-                            let reply = typeof rule.reply === 'function' ? rule.reply() : rule.reply;
-                            if (Array.isArray(reply)) {
-                                // It's a multi-bubble reply or a list of options
-                                // If it's a list of options, pick one
-                                if (reply.every(r => !Array.isArray(r))) {
-                                    const chosenReply = reply[Math.floor(Math.random() * reply.length)];
-                                    // Ensure it's an array for multi-bubble handler
-                                    return Array.isArray(chosenReply) ? chosenReply : [chosenReply];
-                                }
-                            }
-                            // If it's a function that returned a multi-bubble array
-                            return reply;
-                        }
-                    }
-                }
-                return ["Got it."]; // Should be unreachable if 'generic' is defined
-            }
-            
-            /**
-             * Starts the timer for random proactive messages
-             */
-            function startProactiveTimer() {
-                if (proactiveInterval) {
-                    clearInterval(proactiveInterval);
-                }
-                
-                // Set a timer for 30-90 seconds
-                const nextMessageTime = Math.random() * 60000 + 30000;
-                
-                proactiveInterval = setTimeout(() => {
-                    triggerProactiveMessage();
-                    startProactiveTimer(); // Schedule the next one
-                }, nextMessageTime);
-            }
-            
-            /**
-             * Triggers a random unprompted message from a random persona
-             */
-            function triggerProactiveMessage() {
-                const personaIds = Object.keys(PERSONAS);
-                const randomPersonaId = personaIds[Math.floor(Math.random() * personaIds.length)];
-                const persona = PERSONAS[randomPersonaId];
-                
-                // Don't send a proactive message if we're currently chatting with them
-                if (randomPersonaId === currentChatId) {
-                    return;
-                }
-                
-                const messages = PROACTIVE_MESSAGES[randomPersonaId];
-                if (!messages || messages.length === 0) return;
-                
-                const messageBubbles = messages[Math.floor(Math.random() * messages.length)];
-                
-                // Add the message(s) with a slight delay to feel natural
-                let bubbleDelay = 0;
-                for (const bubble of messageBubbles) {
-                    setTimeout(() => {
-                        addMessage(randomPersonaId, randomPersonaId, Date.now(), [bubble], true);
-                    }, bubbleDelay);
-                    bubbleDelay += Math.random() * 1500 + 1000; // 1-2.5s between bubbles
-                }
-            }
-
-            // --- 5. THEME, MOBILE & ADMIN LOGIC ---
-            
-            /**
-             * Toggles between light and dark mode
-             */
-            function toggleTheme() {
-                document.body.classList.toggle('dark-mode');
-                document.body.classList.toggle('light-mode');
-                // Save preference
-                localStorage.setItem('fm-chat-theme', document.body.className);
-            }
-            
-            /**
-             * Toggles the admin panel on Shift + A
-             * @param {Event} e - The keydown event
-             */
-            function handleAdminKeydown(e) {
-                if (e.key === 'A' && e.shiftKey) {
-                    e.preventDefault();
-                    openAdminPanel();
-                }
-            }
-            
-            /**
-             * Handles the mobile 5-tap trigger for admin panel
-             */
-            function handleAdminTap() {
-                adminTapCount++;
-                if (adminTapTimer) {
-                    clearTimeout(adminTapTimer);
-                }
-                adminTapTimer = setTimeout(() => {
-                    adminTapCount = 0; // Reset after 1.5 seconds
-                }, 1500);
-
-                if (adminTapCount >= 5) {
-                    adminTapCount = 0;
-                    clearTimeout(adminTapTimer);
-                    openAdminPanel();
-                }
-            }
-
-            /**
-             * Opens the mobile sidebar menu
-             */
-            function openMobileMenu() {
-                sidebarEl.classList.add('open');
-                document.body.classList.add('mobile-menu-open');
-            }
-
-            /**
-             * Closes the mobile sidebar menu
-             */
-            function closeMobileMenu() {
-                sidebarEl.classList.remove('open');
-                document.body.classList.remove('mobile-menu-open');
-            }
-
-            /**
-             * Opens the admin panel
-             */
-            function openAdminPanel() {
-                adminPanelEl.classList.remove('hidden');
-            }
-
-            /**
-             * Closes the admin panel
-             */
-            function closeAdminPanel() {
-                adminPanelEl.classList.add('hidden');
-            }
-
-            /**
-             * Populates the admin panel's persona dropdown
-             */
-            function renderAdminPanel() {
-                adminPersonaSelectEl.innerHTML = '';
-                Object.values(PERSONAS).forEach(persona => {
-                    const option = document.createElement('option');
-                    option.value = persona.id;
-                    option.textContent = persona.name;
-                    adminPersonaSelectEl.appendChild(option);
-                });
-            }
-
-            /**
-             * Handles sending a fake message from the admin panel
-             */
-            function handleAdminSend() {
-                const personaId = adminPersonaSelectEl.value;
-                const message = adminMessageInputEl.value.trim();
-                
-                if (!personaId || !message) return;
-                
-                const persona = PERSONAS[personaId];
-                
-                // Send as multi-bubble if text contains newlines
-                const textBubbles = message.split('\n').filter(Boolean);
-                
-                addMessage(persona.id, persona.name, Date.now(), textBubbles, true);
-                
-                adminMessageInputEl.value = '';
-                closeAdminPanel();
-            }
-            
-            /**
-             * Triggers the Morning Summary from Aston
-             */
-            function triggerMorningSummary() {
-                const summary = REPLY_LOGIC['aston'][0].reply(); // Get the summary function
-                handleBotReplySending('aston', 'Aston', summary);
-                closeAdminPanel();
-            }
-
-            /**
-             * Triggers a progress update from all team members
-             */
-            function triggerProgressUpdate() {
-                const updates = {
-                    'aston': ["Team status: All green. No blockers."],
-                    'maya': ["Finishing the 'Omega' mobile mockups now. ✨"],
-                    'ravi': ["Following up with 3 prospects, 'Stellar' contract is still with legal."],
-                    'neha': ["'Apex' campaign CPC is stable. Analyzing top-of-funnel metrics."],
-                    'kabir': ["video 3 edit is 50% done."]
-                };
-
-                Object.keys(updates).forEach((personaId, index) => {
-                    setTimeout(() => {
-                        const persona = PERSONAS[personaId];
-                        handleBotReplySending(personaId, persona.name, updates[personaId]);
-                    }, index * 1500); // Stagger the messages
-                });
-
-                closeAdminPanel();
-            }
-
-            /**
-             * Handles clearing all chat history from localStorage
-             */
-            function handleAdminClearChat() {
-                if (confirm("Are you sure you want to permanently delete all chat history?")) {
-                    allMessages = {};
-                    saveMessages();
-                    
-                    // Clear unread dots
-                    document.querySelectorAll('.dm-item.unread').forEach(el => {
-                        el.classList.remove('unread');
-                    });
-                    
-                    renderMessages(); // Clear the current view
-                    closeAdminPanel();
-                    
-                    // Re-seed the chat to make it look alive again
-                    setTimeout(seedInitialChat, 1000);
-                }
-            }
-
-
-            // --- 6. DATA & HISTORY ---
-
-            /**
-             * Loads messages from localStorage
-             */
-            function loadMessages() {
-                const savedMessages = localStorage.getItem('fm-chat-messages');
-                if (savedMessages) {
-                    allMessages = JSON.parse(savedMessages);
-                } else {
-                    allMessages = {};
-                }
-            }
-
-            /**
-             * Saves all messages to localStorage
-             */
-            function saveMessages() {
-                localStorage.setItem('fm-chat-messages', JSON.stringify(allMessages));
-            }
-
-            /**
-             * Seeds the chat with initial history to make it look alive
-             */
-            function seedInitialChat() {
-                const now = Date.now();
-                const day = 86400000;
-                
-                allMessages = {
-                    'aston': [
-                        { id: 'seed1', senderId: 'aston', timestamp: now - (2 * day) - 3600000, text: ["Morning. Just confirming the new 'Omega' project kickoff."]},
-                        { id: 'seed2', senderId: 'ceo', timestamp: now - (2 * day) - 3500000, text: ["Confirmed. Are Ravi and Neha looped in on the targets?"]},
-                        { id: 'seed3', senderId: 'aston', timestamp: now - (2 * day) - 3400000, text: ["Yes. They are synced."]}
-                    ],
-                    'maya': [
-                        { id: 'seed4', senderId: 'maya', timestamp: now - (1 * day) - 7200000, text: ["Hey! 👋", "Sent over the first-pass mockups for 'Omega'. Let me know what you think! ✨"]},
-                        { id: 'seed5', senderId: 'ceo', timestamp: now - (1 * day) - 7100000, text: ["Looks good, Maya. Let's try a version with a darker CTA button."]},
-                        { id: 'seed6', senderId: 'maya', timestamp: now - (1 * day) - 7000000, text: ["Sure thing!", "Will send a v2 over shortly."]}
-                    ],
-                    'ravi': [
-                        { id: 'seed7', senderId: 'ravi', timestamp: now - 3600000, text: ["Morning boss.", "Sales are up 14% this week. 🚀"]},
-                        { id: 'seed8', senderId: 'ceo', timestamp: now - 3500000, text: ["Excellent news, Ravi. What's the status on 'Stellar Solutions'?"]},
-                        { id: 'seed9', senderId: 'ravi', timestamp: now - 3400000, text: ["Contract is with their legal team. They said we should have it back by EOD tomorrow."]}
-                    ],
-                    'neha': [
-                        { id: 'seed10', senderId: 'neha', timestamp: now - (1 * day) - 10800000, text: ["The analytics from the 'Apex' campaign are in.", "CTR is 2.2% and we have 45 new MQLs so far."]},
-                    ],
-                    'kabir': [
-                        { id: 'seed11', senderId: 'kabir', timestamp: now - 7200000, text: ["video 1 (final) is uploaded."]},
-                        { id: 'seed12', senderId: 'ceo', timestamp: now - 7100000, text: ["Thanks. Please start on video 2. Assets are in the usual folder."]},
-                        { id: 'seed13', senderId: 'kabir', timestamp: now - 7000000, text: ["yep. downloading now."]}
-                    ]
-                };
-                
-                saveMessages();
-                renderMessages();
-            }
-
-            // --- 7. START THE APP ---
-            initApp();
-
-        });
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
     </script>
 </body>
 </html>
-
