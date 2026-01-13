@@ -3,128 +3,672 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Official Invitation: IDS 2026 | Aryaveer Mishra</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <title>JEE Main Mock Test - Mole Concept (100 Q)</title>
     <style>
+        :root {
+            --primary: #1a73e8;
+            --success: #0f9d58;
+            --danger: #d93025;
+            --warning: #f4b400;
+            --light: #f1f3f4;
+            --dark: #202124;
+            --border: #dadce0;
+        }
+
         body {
-            background-color: #0f172a;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
-        .serif {
-            font-family: 'Playfair Display', serif;
+
+        /* Top Header */
+        header {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 10;
         }
-        .gold-text {
-            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+
+        h3 { margin: 0; font-size: 1.2rem; color: var(--dark); }
+
+        .timer-display {
+            background: var(--dark);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
         }
-        .gold-border {
-            border-image: linear-gradient(to right, #bf953f, #fcf6ba, #aa771c) 1;
+
+        /* Main Layout */
+        .layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
         }
-        .invitation-card {
-            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
-            box-shadow: 0 0 50px rgba(0,0,0,0.5), inset 0 0 100px rgba(191, 149, 63, 0.05);
+
+        /* Left: Question Area */
+        .q-container {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
         }
-        @media print {
-            .no-print { display: none; }
-            body { background-color: white; }
-            .invitation-card { border: 2px solid #bf953f; color: black; background: white; shadow: none; }
-            .invitation-card p, .invitation-card h2 { color: black !important; }
+
+        .q-info-bar {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            color: #5f6368;
+            font-weight: 500;
         }
+
+        .q-text {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #202124;
+        }
+
+        .options-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .option-item:hover { background: #f8f9fa; }
+        
+        .option-item input {
+            margin-right: 15px;
+            width: 18px; 
+            height: 18px;
+        }
+
+        /* Right: Sidebar */
+        .sidebar {
+            width: 320px;
+            background: #fff;
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .profile-sec {
+            padding: 15px;
+            background: #e8f0fe;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .legend {
+            padding: 10px;
+            font-size: 0.8rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+        .palette-area {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-auto-rows: 40px;
+            gap: 8px;
+            align-content: start;
+        }
+
+        .pal-btn {
+            border: 1px solid #dadce0;
+            background: #fff;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .pal-btn:hover { background: #f1f3f4; }
+        .pal-btn.current { border: 2px solid var(--primary); }
+        .pal-btn.answered { background: var(--success); color: white; border-color: var(--success); }
+        .pal-btn.not-answered { background: var(--danger); color: white; border-color: var(--danger); }
+        .pal-btn.review { background: #5f259f; color: white; border-color: #5f259f; border-radius: 50%; }
+        .pal-btn.ans-review { background: #5f259f; color: white; border-color: #5f259f; border-radius: 50%; }
+        .pal-btn.ans-review::after { content: '✔'; font-size: 8px; position: absolute; bottom: 2px; right: 2px; }
+
+        /* Footer */
+        .footer {
+            height: 70px;
+            border-top: 1px solid var(--border);
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 10;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .btn-secondary { background: #fff; border: 1px solid var(--border); color: #3c4043; }
+        .btn-secondary:hover { background: #f8f9fa; }
+        
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #1765cc; }
+
+        .btn-submit { background: var(--success); color: white; width: 100%; margin-top: 10px; padding: 12px; }
+        .btn-review { background: var(--warning); color: #202124; }
+        
+        .finish-btn {
+            background-color: var(--danger); 
+            color: white; 
+            padding: 8px 16px; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            border: none; 
+            cursor: pointer;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: white;
+            width: 80%;
+            max-width: 900px;
+            height: 90%;
+            border-radius: 8px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .score-summary {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box { text-align: center; }
+        .stat-val { font-size: 2rem; font-weight: bold; display: block; }
+        .stat-label { color: #5f6368; font-size: 0.9rem; }
+
+        .results-table-container {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; position: sticky; top: 0; }
+        
+        .status-correct { color: var(--success); font-weight: bold; }
+        .status-wrong { color: var(--danger); font-weight: bold; }
+        .status-un { color: #999; }
+
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4 md:p-12">
+<body>
 
-    <div class="max-w-4xl w-full invitation-card border-[12px] gold-border p-8 md:p-20 relative overflow-hidden text-center">
-        
-        <!-- Decorative Corners -->
-        <div class="absolute top-4 left-4 w-20 h-20 border-t-2 border-l-2 border-[#bf953f]/30"></div>
-        <div class="absolute top-4 right-4 w-20 h-20 border-t-2 border-r-2 border-[#bf953f]/30"></div>
-        <div class="absolute bottom-4 left-4 w-20 h-20 border-b-2 border-l-2 border-[#bf953f]/30"></div>
-        <div class="absolute bottom-4 right-4 w-20 h-20 border-b-2 border-r-2 border-[#bf953f]/30"></div>
+    <header>
+        <h3>JEE Main Mock: Mole Concept</h3>
+        <div style="display:flex; gap:10px; align-items:center;">
+             <button class="finish-btn" onclick="submitQuiz(false)">FINISH TEST</button>
+             <div class="timer-display" id="timer">03:00:00</div>
+        </div>
+    </header>
 
-        <!-- IAMAI Logo Concept -->
-        <div class="mb-12 flex justify-center flex-col items-center">
-            <div class="text-[#bf953f] font-black tracking-[0.4em] text-[10px] uppercase mb-4">Presented By</div>
-            <div class="relative w-24 h-12 flex items-center justify-center border border-[#bf953f]/40 px-4">
-                <span class="text-white font-black text-xl tracking-tighter italic">IAMAI</span>
+    <div class="layout">
+        <div class="q-container">
+            <div class="q-info-bar">
+                <span id="q-num-display">Question 1</span>
+                <span>Single Correct Choice • <strong>+4, -1</strong></span>
+            </div>
+            <div id="q-content">
+                <!-- Dynamic Content -->
             </div>
         </div>
 
-        <!-- Header -->
-        <h4 class="text-[#bf953f] font-bold uppercase tracking-[0.5em] text-xs mb-8">Internet and Mobile Association of India</h4>
-        
-        <p class="serif text-white text-xl md:text-2xl italic mb-10 opacity-90">Requests the distinguished presence of</p>
-        
-        <h1 class="gold-text serif text-4xl md:text-7xl font-bold mb-6 tracking-tight italic">Aryaveer Mishra</h1>
-        
-        <p class="text-blue-400 font-bold uppercase tracking-[0.3em] text-xs mb-12">Chief Executive, Feasibility Media</p>
-
-        <!-- Body -->
-        <div class="max-w-3xl mx-auto space-y-6 text-slate-300 leading-relaxed mb-16">
-            <p class="text-lg">
-                To join the inaugural panel of <span class="text-white font-bold">Keynote Visionaries</span>,
-                <br>graced by the presence of the
-            </p>
-            <h3 class="gold-text serif text-2xl md:text-3xl font-bold italic mb-4">Honorable Prime Minister of India</h3>
-            <p class="text-lg">at the</p>
-            <h2 class="serif text-4xl md:text-6xl text-white italic">"20th India Digital Summit 2026"</h2>
-            <p class="text-sm tracking-widest uppercase font-bold text-blue-500/80">Theme: Leveraging India's Intelligent Economy</p>
-            <p>
-                In recognition of your groundbreaking work with <span class="italic font-bold text-white">Feasibility Media</span>, we invite you to lead the discourse on "Strategic Viability in the Age of Generative Influence" alongside our esteemed state leadership.
-            </p>
-        </div>
-
-        <!-- Event Details -->
-        <div class="grid md:grid-cols-3 gap-8 border-y border-[#bf953f]/20 py-10 mb-16">
-            <div class="space-y-2">
-                <div class="flex justify-center text-[#bf953f] mb-2"><i data-lucide="calendar"></i></div>
-                <p class="text-white font-bold uppercase tracking-widest text-xs">Dates</p>
-                <p class="text-slate-400 font-medium">January 29 - 30, 2026</p>
+        <div class="sidebar">
+            <div class="profile-sec">
+                <div>Candidate Name</div>
             </div>
-            <div class="space-y-2">
-                <div class="flex justify-center text-[#bf953f] mb-2"><i data-lucide="map-pin"></i></div>
-                <p class="text-white font-bold uppercase tracking-widest text-xs">Venue</p>
-                <p class="text-slate-400 font-medium italic"> Leela Bharatiya City, Bengaluru.
+            <div class="legend">
+                <div class="legend-item"><span class="dot" style="background:var(--success)"></span> Answered</div>
+                <div class="legend-item"><span class="dot" style="background:var(--danger)"></span> Not Ans</div>
+                <div class="legend-item"><span class="dot" style="background:#fff; border:1px solid #ccc"></span> Unvisited</div>
+                <div class="legend-item"><span class="dot" style="background:#5f259f"></span> Mark Review</div>
             </div>
-            <div class="space-y-2">
-                <div class="flex justify-center text-[#bf953f] mb-2"><i data-lucide="clock"></i></div>
-                <p class="text-white font-bold uppercase tracking-widest text-xs">Special Session</p>
-                <p class="text-slate-400 font-medium">14:30 Hours | Hall 5</p>
+            <div class="palette-area" id="palette">
+                <!-- Grid -->
+            </div>
+            <div style="padding: 15px; border-top: 1px solid var(--border)">
+                <button class="btn btn-submit" onclick="submitQuiz(false)">SUBMIT TEST</button>
             </div>
         </div>
+    </div>
 
-        <!-- RSVP -->
-        <div class="space-y-4">
-            <p class="text-[#bf953f] font-bold uppercase tracking-[0.2em] text-[10px]">Security Clearance: VIP - VVIP Tier 1 (State Guest)</p>
-            <p class="text-slate-500 text-xs italic">Kindly confirm your session attendance to the IAMAI Protocol Liaison by Jan 20th</p>
-            <div class="pt-8">
-                <div class="inline-block p-4 border border-[#bf953f]/30 rounded-xl bg-white/5">
-                    <!-- Dynamic QR representing official IAMAI portal -->
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.indiadigitalsummit.in/RSVP/ARYAVEER_MISHRA_IDS2026" alt="RSVP QR" class="opacity-80 grayscale invert">
+    <div class="footer">
+        <div>
+            <button class="btn btn-secondary" onclick="changeQ(-1)">Previous</button>
+            <button class="btn btn-review" onclick="markReview()">Mark for Review & Next</button>
+        </div>
+        <button class="btn btn-primary" onclick="saveNext()">Save & Next</button>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirm-modal" style="z-index: 1100;">
+        <div class="modal-box" style="height: auto; max-width: 500px; text-align: center;">
+            <h3 style="margin-top: 0;">Submit Test?</h3>
+            <p>You have attempted <strong id="confirm-att">0</strong> out of <strong id="confirm-total">0</strong> questions.</p>
+            <p>Are you sure you want to finish and view your score?</p>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeConfirm()">Cancel</button>
+                <button class="btn btn-submit" style="width: auto; margin-top: 0;" onclick="submitQuiz(true)">Yes, Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-box">
+            <h2 style="margin-top:0">Test Result Analysis</h2>
+            <div class="score-summary">
+                <div class="stat-box">
+                    <span class="stat-val" style="color:var(--primary)" id="res-score">0</span>
+                    <span class="stat-label">Total Score</span>
                 </div>
-                <p class="mt-2 text-[10px] text-slate-600 font-bold tracking-widest uppercase">E-Pass ID: IAMAI-IDS-2026-0042</p>
+                <div class="stat-box">
+                    <span class="stat-val" style="color:var(--success)" id="res-correct">0</span>
+                    <span class="stat-label">Correct</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-val" style="color:var(--danger)" id="res-wrong">0</span>
+                    <span class="stat-label">Incorrect</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-val" id="res-att">0</span>
+                    <span class="stat-label">Attempted</span>
+                </div>
             </div>
+            <div class="results-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Q#</th>
+                            <th>Question Preview</th>
+                            <th>Your Ans</th>
+                            <th>Correct Ans</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody id="res-table-body"></tbody>
+                </table>
+            </div>
+            <button class="btn btn-primary" style="margin-top:20px; width:200px; align-self: flex-end;" onclick="location.reload()">Take Test Again</button>
         </div>
-
     </div>
 
-    <!-- Controls -->
-    <div class="fixed bottom-8 right-8 no-print flex gap-4">
-        <button onclick="window.print()" class="p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white hover:bg-white hover:text-black transition-all shadow-2xl" title="Print Invitation">
-            <i data-lucide="printer"></i>
-        </button>
-        <button class="p-4 bg-blue-600 border border-blue-500 rounded-full text-white hover:bg-blue-500 transition-all shadow-2xl" title="Share Invitation">
-            <i data-lucide="share-2"></i>
-        </button>
-    </div>
+<script>
+    // --- DATABASE OF 100 QUESTIONS ---
+    const questions = [
+        { q: "Calculate number of neutrons in 14g of 14C isotope.", o: ["6 Na", "8 Na", "14 Na", "7 Na"], a: 1 },
+        { q: "How many moles of electron weigh 1 kg?", o: ["1/(9.108 x 10^23)", "1/(9.108 x 10^31)", "1/(9.108 x 10^8)", "1/(9.108 x 10^5)"], a: 2 },
+        { q: "The number of atoms in 0.1 mol of a triatomic gas is: (Na = Avogadro no.)", o: ["0.3 Na", "Na", "3 Na", "0.1 Na"], a: 0 },
+        { q: "Which has maximum number of atoms?", o: ["24g C(12)", "56g Fe(56)", "27g Al(27)", "108g Ag(108)"], a: 0 },
+        { q: "Volume occupied by one molecule of water (density=1 g/mL) is:", o: ["3.0 x 10^-23 mL", "5.5 x 10^-23 mL", "9.0 x 10^-23 mL", "6.023 x 10^-23 mL"], a: 0 },
+        { q: "Common salt obtained from sea-water contains 95% NaCl by mass. The approximate number of formula units in 10.0 g of the salt is:", o: ["10^23", "10^24", "10^21", "10^20"], a: 0 },
+        { q: "Total number of electrons in 1.6 g of CH4 is:", o: ["6.02 x 10^23", "6.02 x 10^22", "6.02 x 10^21", "6.02 x 10^24"], a: 0 },
+        { q: "The mass of 112 cm³ of CH4 gas at STP is:", o: ["0.16 g", "0.8 g", "0.08 g", "1.6 g"], a: 2 },
+        { q: "Which of the following contains the least number of molecules?", o: ["4.4g CO2", "3.4g NH3", "1.6g CH4", "3.2g SO2"], a: 3 },
+        { q: "If Na is Avogadro's number, then number of valence electrons in 4.2g of nitride ions (N3-) is:", o: ["2.4 Na", "4.2 Na", "1.6 Na", "3.2 Na"], a: 0 },
+        { q: "Ratio of masses of O2 and N2 in a particular gaseous mixture is 1:4. The ratio of number of their molecules is:", o: ["7:32", "1:4", "1:8", "3:16"], a: 0 },
+        { q: "A gaseous mixture contains oxygen and nitrogen in the ratio of 1:4 by weight. The ratio of their number of molecules is:", o: ["1:4", "1:8", "7:32", "3:16"], a: 2 },
+        { q: "How many grams of H3PO4 contain 0.25 moles of oxygen atoms?", o: ["6.125 g", "24.5 g", "98 g", "4.05 g"], a: 0 },
+        { q: "The number of water molecules is maximum in:", o: ["1.8 gram of water", "18 gram of water", "18 moles of water", "18 molecules of water"], a: 2 },
+        { q: "What is the mass of precipitate formed when 50 mL of 16.9% solution of AgNO3 is mixed with 50 mL of 5.8% NaCl solution? (Ag=107.8, N=14, O=16, Na=23, Cl=35.5)", o: ["28 g", "3.5 g", "7 g", "14 g"], a: 2 },
+        { q: "10 g of hydrogen and 64 g of oxygen were filled in a steel vessel and exploded. Amount of water produced in this reaction will be:", o: ["3 moles", "4 moles", "1 mole", "2 moles"], a: 1 },
+        { q: "What is the limiting reagent when 2g of H2 reacts with 32g of O2?", o: ["H2", "O2", "Both", "None"], a: 3 },
+        { q: "How much water is produced by combustion of 16g Methane?", o: ["18g", "36g", "9g", "72g"], a: 1 },
+        { q: "Stoichiometric ratio of H2 and N2 to form NH3 is:", o: ["3:1", "1:3", "1:1", "2:3"], a: 0 },
+        { q: "Volume of CO2 obtained at STP by complete decomposition of 9.85g BaCO3 (At. mass Ba=137) is:", o: ["2.24 L", "1.12 L", "0.84 L", "0.56 L"], a: 1 },
+        { q: "For the reaction A + 2B -> C, 5 moles of A and 8 moles of B will produce:", o: ["5 moles of C", "4 moles of C", "8 moles of C", "13 moles of C"], a: 1 },
+        { q: "Equal masses of H2, O2 and methane have been taken in a container of volume V at temp 27C in identical conditions. The ratio of volumes of gases H2:O2:CH4 would be:", o: ["16:1:2", "8:1:2", "16:8:1", "1:1:1"], a: 3 },
+        { q: "Weight of Oxygen required for complete combustion of 2.8 kg ethylene (C2H4) is:", o: ["2.8 kg", "6.4 kg", "9.6 kg", "96 kg"], a: 2 },
+        { q: "In the reaction 4NH3 + 5O2 -> 4NO + 6H2O, when 1 mole of ammonia and 1 mole of O2 are made to react to completion:", o: ["1.0 mole of H2O is produced", "1.0 mole of NO will be produced", "All O2 will be consumed", "All NH3 will be consumed"], a: 2 },
+        { q: "20.0 g of a magnesium carbonate sample decomposes on heating to give carbon dioxide and 8.0 g magnesium oxide. What will be the percentage purity of magnesium carbonate in the sample?", o: ["60", "84", "75", "96"], a: 1 },
+        { q: "When 22.4L of H2 (g) is mixed with 11.2L of Cl2 (g), each at STP, the moles of HCl(g) formed is equal to:", o: ["1 mol", "2 mol", "0.5 mol", "1.5 mol"], a: 0 },
+        { q: "How many moles of lead (II) chloride will be formed from a reaction between 6.5 g of PbO and 3.2 g of HCl?", o: ["0.044", "0.333", "0.011", "0.029"], a: 3 },
+        { q: "Molarity of liquid HCl if density of solution is 1.17 g/cc is:", o: ["36.5", "18.25", "32.05", "42.10"], a: 2 },
+        { q: "The density of 2M aqueous solution of NaOH is 1.28 g/cm3. The molality of the solution is [Given that molecular mass of NaOH = 40 g mol–1]", o: ["1.20 m", "1.56 m", "1.67 m", "1.32 m"], a: 2 },
+        { q: "What is the molarity of 0.2N Na2CO3 solution?", o: ["0.1 M", "0.2 M", "0.4 M", "0.05 M"], a: 0 },
+        { q: "A solution consists of 1 mole of ethanol and 9 moles of water. The mole fraction of water is:", o: ["0.1", "0.5", "0.9", "9.0"], a: 2 },
+        { q: "How many grams of CH3OH should be added to water to prepare 150 ml solution of 2 M CH3OH?", o: ["9.6 g", "2.4 g", "9.6 x 10^3 g", "4.3 g"], a: 0 },
+        { q: "The molarity of a solution obtained by mixing 750 mL of 0.5(M) HCl with 250 mL of 2(M) HCl will be:", o: ["0.875 M", "1.00 M", "1.75 M", "0.975 M"], a: 0 },
+        { q: "Temperature dependent concentration term is:", o: ["Molality", "Mole Fraction", "Molarity", "Mass percentage"], a: 2 },
+        { q: "Normality of 0.3 M H3PO4 is:", o: ["0.1 N", "0.3 N", "0.6 N", "0.9 N"], a: 3 },
+        { q: "Mole fraction of the solute in a 1.00 molal aqueous solution is:", o: ["0.0177", "0.0344", "1.7700", "0.1770"], a: 0 },
+        { q: "If 500 mL of a 5M solution is diluted to 1500 mL, what will be the new molarity?", o: ["1.5 M", "1.66 M", "2.5 M", "3 M"], a: 1 },
+        { q: "An aqueous solution of glucose is 10% in strength. The volume in which 1g mole of it is dissolved will be:", o: ["18 L", "9 L", "0.9 L", "1.8 L"], a: 3 },
+        { q: "Unit of mole fraction is:", o: ["moles/litre", "moles/kg", "dimensionless", "g/litre"], a: 2 },
+        { q: "Calculate the mass of Urea (NH2CONH2) required in making 2.5 kg of 0.25 molal aqueous solution.", o: ["37 g", "25 g", "32 g", "40 g"], a: 0 },
+        { q: "What is the % carbon in CH4?", o: ["25%", "50%", "75%", "80%"], a: 2 },
+        { q: "A compound contains 50% element A (At mass 10) and 50% element B (At mass 20). Empirical formula is:", o: ["AB", "A2B", "AB2", "A2B3"], a: 1 },
+        { q: "An organic compound contains C = 40%, H = 6.7% and O = 53.3%. Its empirical formula is:", o: ["CH2O", "C2H4O2", "CH3O", "CHO"], a: 0 },
+        { q: "A hydrocarbon contains 80% Carbon. Its empirical formula is:", o: ["CH", "CH2", "CH3", "CH4"], a: 2 },
+        { q: "Empirical formula of a compound is CH2O. If its molecular weight is 180, molecular formula is:", o: ["C3H6O3", "C4H8O4", "C5H10O5", "C6H12O6"], a: 3 },
+        { q: "Which pair of species have the same percentage of Carbon?", o: ["CH3COOH and C6H12O6", "CH3COOH and C2H5OH", "HCOOCH3 and C12H22O11", "C6H6 and C2H2"], a: 3 }, // Benzene and Acetylene have same %C
+        { q: "Insulin contains 3.4% sulphur. Minimum molecular weight of insulin is:", o: ["941", "900", "3400", "1500"], a: 0 },
+        { q: "Haemoglobin contains 0.334% of iron by weight. The molecular weight of haemoglobin is approximately 67200. The number of iron atoms (Atomic weight of Fe is 56) present in one molecule of haemoglobin is:", o: ["4", "6", "3", "2"], a: 0 },
+        { q: "Simplest formula of a compound containing 50% of element X (at wt 10) and 50% of element Y (at wt 20) is:", o: ["XY", "X2Y", "XY2", "X2Y3"], a: 1 },
+        { q: "Caffeine has a molecular weight of 194. If it contains 28.9% by mass of nitrogen, number of atoms of nitrogen in one molecule of caffeine is:", o: ["2", "3", "4", "5"], a: 2 },
+        { q: "Equivalent weight of H2SO4 in reaction: H2SO4 + NaOH -> NaHSO4 + H2O is:", o: ["98", "49", "196", "32.6"], a: 0 },
+        { q: "Equivalent weight of KMnO4 in acidic medium is (M = Molar Mass):", o: ["M/1", "M/3", "M/5", "M/2"], a: 2 },
+        { q: "Equivalent weight of K2Cr2O7 in acidic medium is (M = Molar Mass):", o: ["M/1", "M/3", "M/6", "M/2"], a: 2 },
+        { q: "Oxidation number of Cr in CrO5 is:", o: ["+6", "+10", "+3", "+5"], a: 0 },
+        { q: "Oxidation number of S in H2SO5 (Caro's acid) is:", o: ["+8", "+6", "+4", "+2"], a: 1 },
+        { q: "Equivalent weight of oxalic acid (H2C2O4.2H2O) is:", o: ["126", "63", "90", "45"], a: 1 },
+        { q: "The number of moles of KMnO4 that will be needed to react with one mole of sulphite ion in acidic solution is:", o: ["2/5", "3/5", "4/5", "1"], a: 0 },
+        { q: "n-factor for FeS2 -> Fe2O3 + SO2 is:", o: ["1", "11", "10", "4"], a: 1 },
+        { q: "In the reaction: 3Br2 + 6CO3(2-) + 3H2O -> 5Br- + BrO3- + 6HCO3-, Br2 acts as:", o: ["Oxidant", "Reductant", "Both", "None"], a: 2 },
+        { q: "Volume of 0.1 M KMnO4 required to oxidise 20 ml of 0.1 M oxalic acid in acidic medium is:", o: ["20 ml", "40 ml", "16 ml", "8 ml"], a: 3 },
+        { q: "The equivalent weight of phosphoric acid (H3PO4) in the reaction: NaOH + H3PO4 -> NaH2PO4 + H2O is:", o: ["25", "49", "59", "98"], a: 3 },
+        { q: "Mass of one atom of Oxygen is:", o: ["16 g", "32 g", "2.65 x 10^-23 g", "5.3 x 10^-23 g"], a: 2 },
+        { q: "Which of the following changes with temperature?", o: ["Molality", "Fraction", "Molarity", "Weight percent"], a: 2 },
+        { q: "A molal solution is one that contains one mole of a solute in:", o: ["1000 g of solvent", "1.0 L of solvent", "1.0 L of solution", "22.4 L of solution"], a: 0 },
+        { q: "One mole of CO2 contains:", o: ["6.02x10^23 atoms of C", "6.02x10^23 atoms of O", "18.1x10^23 molecules of CO2", "3 g atoms of CO2"], a: 0 },
+        { q: "At STP, the density of a gas is 1.25 g/L. Its molar mass is:", o: ["28", "44", "14", "32"], a: 0 },
+        { q: "10 mL of gaseous hydrocarbon on combustion gives 40 mL of CO2(g) and 50 mL of H2O(vap). The hydrocarbon is:", o: ["C4H8", "C4H10", "C8H10", "C4H6"], a: 1 },
+        { q: "Volume of air needed for complete combustion of 1 kg of carbon (Air contains 21% O2 by vol):", o: ["6000 L", "8889 L", "4000 L", "9500 L"], a: 1 },
+        { q: "Law of multiple proportions is illustrated by:", o: ["CO and CO2", "NaCl and NaBr", "H2O and D2O", "MgO and Mg(OH)2"], a: 0 },
+        { q: "Gay Lussac's Law of combining volumes is applicable for:", o: ["Gases only", "Solids only", "Liquids only", "All states"], a: 0 },
+        { q: "Which of the following is not a redox reaction?", o: ["Burning of Candle", "Rusting of Iron", "Dissolving Salt in Water", "Dissolving Zn in HCl"], a: 2 },
+        { q: "How many moles of Fe2+ ions are formed when excess iron is treated with 500mL of 0.4 M HCl?", o: ["0.1", "0.2", "0.4", "0.8"], a: 0 },
+        { q: "Calculate the mass of Ca(OH)2 required to neutralize 200 mL of 0.5 M HCl.", o: ["3.7 g", "7.4 g", "1.85 g", "10 g"], a: 0 },
+        { q: "Mole fraction of I2 in Benzene is 0.2. Molality of I2 in Benzene is:", o: ["3.2 m", "2.5 m", "4.0 m", "1.8 m"], a: 0 },
+        { q: "Maximum number of molecules is present in:", o: ["15 L of H2 gas at STP", "5 L of N2 gas at STP", "0.5 g of H2 gas", "10 g of O2 gas"], a: 0 },
+        { q: "Number of atoms in 558.5 g Fe (At. wt = 55.85) is:", o: ["10 Na", "Na", "5 Na", "100 Na"], a: 0 },
+        { q: "The vapour density of a gas is 11.2. The volume occupied by 11.2 g of the gas at STP will be:", o: ["11.2 L", "22.4 L", "5.6 L", "1.0 L"], a: 0 },
+        { q: "Which sample contains the largest number of atoms?", o: ["1mg of C4H10", "1mg of N2", "1mg of Na", "1ml of Water"], a: 3 },
+        { q: "Rearrange the following (I to IV) in the order of increasing masses: I. 0.5 mole of O3 II. 0.5 g atom of Oxygen III. 3.011 x 10^23 molecules of O2 IV. 5.6 litre of CO2 at STP", o: ["II < IV < III < I", "II < I < IV < III", "IV < II < III < I", "I < II < III < IV"], a: 0 },
+        { q: "A mixture of 2.3 g formic acid and 4.5 g oxalic acid is treated with conc. H2SO4. The evolved gaseous mixture is passed through KOH pellets. Weight (in g) of the remaining product at STP will be:", o: ["1.4", "3.0", "2.8", "4.4"], a: 2 },
+        { q: "25.3 g of sodium carbonate, Na2CO3 is dissolved in enough water to make 250 mL of solution. If sodium carbonate dissociates completely, molar concentration of sodium ion, Na+ and carbonate ions, CO3(2-) are respectively:", o: ["0.955 M and 1.910 M", "1.910 M and 0.955 M", "1.90 M and 1.90 M", "0.477 M and 0.477 M"], a: 1 },
+        { q: "10 mL of 2(M) NaOH solution is added to 200 mL of 0.5 (M) of NaOH solution. What is the final concentration?", o: ["0.57 M", "5.7 M", "11.4 M", "1.14 M"], a: 0 },
+        { q: "How many moles of magnesium phosphate, Mg3(PO4)2 will contain 0.25 mole of oxygen atoms?", o: ["0.02", "3.125 x 10^-2", "1.25 x 10^-2", "2.5 x 10^-2"], a: 1 },
+        { q: "Density of a 2.05 M solution of acetic acid in water is 1.02 g/mL. The molality of the solution is:", o: ["1.14 mol/kg", "3.28 mol/kg", "2.28 mol/kg", "0.44 mol/kg"], a: 2 },
+        { q: "Consider a titration of potassium dichromate solution with acidified Mohr's salt solution. The number of moles of Mohr's salt required per mole of dichromate is:", o: ["3", "4", "5", "6"], a: 3 },
+        { q: "A 5.2 molal aqueous solution of methyl alcohol, CH3OH, is supplied. What is the mole fraction of methyl alcohol in the solution?", o: ["0.100", "0.190", "0.086", "0.050"], a: 2 },
+        { q: "The ratio of mass percent of C and H of an organic compound (CXHYOZ) is 6 : 1. If one molecule of the above compound (CXHYOZ) contains half as much oxygen as required to burn one molecule of compound CXHY completely to CO2 and H2O. The empirical formula of compound CXHYOZ is:", o: ["C2H4O", "C3H4O2", "C2H4O3", "C3H6O3"], a: 3 },
+        { q: "Given that the abundances of isotopes 54Fe, 56Fe and 57Fe are 5%, 90% and 5%, respectively, the atomic mass of Fe is:", o: ["55.85", "55.95", "55.75", "56.05"], a: 1 },
+        { q: "How many mL of 0.5 M H2SO4 are needed to dissolve 0.5 g of copper(II) carbonate?", o: ["8.1 mL", "16.2 mL", "4.0 mL", "20.0 mL"], a: 0 },
+        { q: "Calculate the normality of a solution containing 15.8 g of KMnO4 in 50 mL of acidic solution.", o: ["5 N", "10 N", "2 N", "1 N"], a: 1 },
+        { q: "Which of the following contains the greatest number of N atoms?", o: ["500 ml of 2.0M HNO3", "500 ml of 1.0M NH4Cl", "500 ml of 1.0M (NH4)2SO4", "500 ml of 1.0M CH3COONH4"], a: 2 },
+        { q: "Volume of water needed to mix with 10 mL 10N HNO3 to get 0.1 N HNO3 is:", o: ["1000 mL", "990 mL", "1010 mL", "10 mL"], a: 1 },
+        { q: "1 mole of a compound contains 1 mole of C and 2 moles of O. The molecular weight is:", o: ["32", "12", "44", "28"], a: 2 },
+        { q: "Mass of 0.1 mole of methane is:", o: ["1 g", "16 g", "1.6 g", "0.1 g"], a: 2 },
+        { q: "Number of gram atoms of S in 98g of H2SO4 is:", o: ["1", "2", "3", "4"], a: 0 },
+        { q: "If 0.5 moles of BaCl2 is mixed with 0.2 moles of Na3PO4, the maximum number of moles of Ba3(PO4)2 that can be formed is:", o: ["0.7", "0.5", "0.1", "0.2"], a: 2 },
+        { q: "Boron has two stable isotopes, 10B (19%) and 11B (81%). Calculate average atomic mass of boron in the periodic table.", o: ["10.81", "10.2", "11.2", "10.0"], a: 0 },
+        { q: "Difference in number of significant figures in 0.003 and 3.00 is:", o: ["2", "1", "3", "0"], a: 0 },
+        { q: "What is the weight of oxygen required for the complete combustion of 2.8 kg of ethylene?", o: ["2.8 kg", "6.4 kg", "9.6 kg", "96 kg"], a: 2 },
+        { q: "At STP 1 g of Calcium Carbonate gives what volume of CO2?", o: ["2.24 L", "0.224 L", "11.2 L", "22.4 L"], a: 1 }
+    ];
 
-    <script>
-        window.onload = function() {
-            lucide.createIcons();
-        };
-    </script>
+    // --- STATE MANAGEMENT ---
+    let currentQ = 0;
+    let answers = [];
+    let visited = [];
+    let markedReview = [];
+    let timeLeft = 3 * 3600; // 3 hours
+    let timerInterval;
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+        // Initialize state based on actual question count
+        const totalQ = questions.length;
+        answers = new Array(totalQ).fill(null);
+        visited = new Array(totalQ).fill(false);
+        markedReview = new Array(totalQ).fill(false);
+        
+        renderPalette();
+        loadQuestion(0);
+        startTimer();
+    };
+
+    // --- CORE FUNCTIONS ---
+    function loadQuestion(index) {
+        if (index < 0 || index >= questions.length) return;
+        
+        currentQ = index;
+        visited[index] = true;
+        
+        // Update Q Number
+        document.getElementById('q-num-display').innerText = `Question ${index + 1} of ${questions.length}`;
+        
+        // Update Question Text
+        const qData = questions[index];
+        const html = `
+            <div class="q-text">${qData.q}</div>
+            <div class="options-list">
+                ${qData.o.map((opt, i) => `
+                    <label class="option-item">
+                        <input type="radio" name="opt" value="${i}" 
+                            ${answers[index] === i ? 'checked' : ''} 
+                            onclick="selectOption(${i})">
+                        ${opt}
+                    </label>
+                `).join('')}
+            </div>
+        `;
+        document.getElementById('q-content').innerHTML = html;
+        
+        updatePalette();
+    }
+
+    function selectOption(optIndex) {
+        answers[currentQ] = optIndex;
+        updatePalette();
+    }
+
+    function saveNext() {
+        if (currentQ < questions.length - 1) loadQuestion(currentQ + 1);
+    }
+
+    function changeQ(diff) {
+        const newIndex = currentQ + diff;
+        if (newIndex >= 0 && newIndex < questions.length) loadQuestion(newIndex);
+    }
+
+    function markReview() {
+        markedReview[currentQ] = true;
+        saveNext();
+    }
+
+    function jumpTo(index) {
+        loadQuestion(index);
+    }
+
+    // --- PALETTE UI ---
+    function renderPalette() {
+        const p = document.getElementById('palette');
+        p.innerHTML = questions.map((_, i) => 
+            `<button id="btn-${i}" class="pal-btn" onclick="jumpTo(${i})">${i + 1}</button>`
+        ).join('');
+    }
+
+    function updatePalette() {
+        questions.forEach((_, i) => {
+            const btn = document.getElementById(`btn-${i}`);
+            btn.className = 'pal-btn';
+            
+            // Logic priority: Current > Review > Answered > NotAnswered > Unvisited
+            if (i === currentQ) btn.classList.add('current');
+            
+            if (markedReview[i]) {
+                if (answers[i] !== null) btn.classList.add('ans-review');
+                else btn.classList.add('review');
+            } else if (answers[i] !== null) {
+                btn.classList.add('answered');
+            } else if (visited[i] && i !== currentQ) {
+                btn.classList.add('not-answered');
+            }
+        });
+    }
+
+    // --- TIMER ---
+    function startTimer() {
+        const display = document.getElementById('timer');
+        timerInterval = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz(true);
+                return;
+            }
+            timeLeft--;
+            const h = Math.floor(timeLeft / 3600);
+            const m = Math.floor((timeLeft % 3600) / 60);
+            const s = timeLeft % 60;
+            display.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }, 1000);
+    }
+
+    // --- SUBMISSION MODAL LOGIC ---
+    function closeConfirm() {
+        document.getElementById('confirm-modal').style.display = 'none';
+    }
+
+    // --- SCORING ---
+    function submitQuiz(force = false) {
+        if (!force) {
+            // Show custom confirmation modal instead of browser alert
+            const attempts = answers.filter(a => a !== null).length;
+            document.getElementById('confirm-att').innerText = attempts;
+            document.getElementById('confirm-total').innerText = questions.length;
+            document.getElementById('confirm-modal').style.display = 'flex';
+            return;
+        }
+        
+        // Proceed with submission
+        document.getElementById('confirm-modal').style.display = 'none';
+        clearInterval(timerInterval);
+        
+        let score = 0, correct = 0, wrong = 0, attempted = 0;
+        let tbody = document.getElementById('res-table-body');
+        tbody.innerHTML = '';
+
+        questions.forEach((q, i) => {
+            const userAns = answers[i];
+            const isAtt = userAns !== null;
+            let resText = "Unattempted";
+            let resClass = "status-un";
+            let rowStyle = "";
+
+            if (isAtt) {
+                attempted++;
+                if (userAns === q.a) {
+                    score += 4;
+                    correct++;
+                    resText = "Correct (+4)";
+                    resClass = "status-correct";
+                    rowStyle = "background: #e6fffa";
+                } else {
+                    score -= 1;
+                    wrong++;
+                    resText = "Incorrect (-1)";
+                    resClass = "status-wrong";
+                    rowStyle = "background: #fff5f5";
+                }
+            }
+
+            // Show Correct Option Text
+            const correctOptText = q.o[q.a];
+            const userAnsText = isAtt ? q.o[userAns] : '-';
+
+            tbody.innerHTML += `
+                <tr style="${rowStyle}">
+                    <td>${i+1}</td>
+                    <td>${q.q}</td>
+                    <td style="${userAns === q.a ? 'color:green;font-weight:bold' : (isAtt ? 'color:red' : '')}">${userAnsText}</td>
+                    <td style="color:green; font-weight:bold">${correctOptText}</td>
+                    <td class="${resClass}">${resText}</td>
+                </tr>
+            `;
+        });
+
+        document.getElementById('res-score').innerText = score + "/" + (questions.length * 4);
+        document.getElementById('res-correct').innerText = correct;
+        document.getElementById('res-wrong').innerText = wrong;
+        document.getElementById('res-att').innerText = attempted;
+        
+        // Hide Main Layout
+        document.querySelector('.layout').style.display = 'none';
+        document.querySelector('.footer').style.display = 'none';
+        document.querySelector('header').style.display = 'none';
+
+        // Show Modal in full screen mode instead of overlay
+        const modal = document.getElementById('resultModal');
+        modal.style.display = 'flex';
+        modal.style.position = 'static'; // Remove fixed positioning to allow scrolling
+        modal.style.background = 'white';
+        modal.style.height = 'auto';
+        
+        const modalBox = modal.querySelector('.modal-box');
+        modalBox.style.width = '100%';
+        modalBox.style.maxWidth = '1000px';
+        modalBox.style.boxShadow = 'none';
+        modalBox.style.height = 'auto';
+        
+        document.body.style.overflow = 'auto'; // Enable scroll on body
+    }
+
+</script>
 </body>
 </html>
